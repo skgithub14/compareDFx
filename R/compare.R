@@ -12,12 +12,11 @@
 #'  * `c2_only`: a character vector with the column names only in `c2`
 #'
 compare_cols <- function(c1, c2) {
-
   both <- intersect(colnames(c1), colnames(c2))
   c1_only <- setdiff(colnames(c1), colnames(c2))
   c2_only <- setdiff(colnames(c2), colnames(c1))
 
-  if (length(c1_only) == 0 & length(c2_only) == 0){
+  if (length(c1_only) == 0 & length(c2_only) == 0) {
     same <- TRUE
   } else {
     same <- FALSE
@@ -49,19 +48,19 @@ compare_cols <- function(c1, c2) {
 #'  * `c1`: the modified `c1` data frame
 #'  * `c2`: the modified `c2` data frame
 #'
-insert_dummy_cols <- function (c1, c2, cc_out, id_cols) {
-
+insert_dummy_cols <- function(c1, c2, cc_out, id_cols) {
   # do nothing if they already have the same columns
   if (cc_out$same) {
     return(
       list(
         c1 = c1,
-        c2 = c2)
+        c2 = c2
+      )
     )
   }
 
   # create missing columns with correct classes via utility function
-  make_cols <- function (ref_df, work_df, make_cols) {
+  make_cols <- function(ref_df, work_df, make_cols) {
     if (length(make_cols) > 0) {
       for (col in make_cols) {
         ref_class <- class(ref_df[[col]])
@@ -83,7 +82,8 @@ insert_dummy_cols <- function (c1, c2, cc_out, id_cols) {
   return(
     list(
       c1 = c1,
-      c2 = c2)
+      c2 = c2
+    )
   )
 }
 
@@ -100,20 +100,22 @@ insert_dummy_cols <- function (c1, c2, cc_out, id_cols) {
 #'  * `c1`: a modified data frame `c1`
 #'  * `c2`: a modified data frame `c2`
 #'
-standardize_col_order <- function (c1, c2, id_cols) {
-
+standardize_col_order <- function(c1, c2, id_cols) {
   not_id_cols <- setdiff(colnames(c1), id_cols)
 
-  c1 <- dplyr::select(c1,
-                      tidyselect::all_of(id_cols),
-                      tidyselect::all_of(not_id_cols))
+  c1 <- dplyr::select(
+    c1,
+    tidyselect::all_of(id_cols),
+    tidyselect::all_of(not_id_cols)
+  )
 
   c2 <- dplyr::select(c2, tidyselect::all_of(colnames(c1)))
 
   return(
     list(
       c1 = c1,
-      c2 = c2)
+      c2 = c2
+    )
   )
 }
 
@@ -136,8 +138,7 @@ standardize_col_order <- function (c1, c2, id_cols) {
 #'  * `no_dups`: this is `df` with all `id_dups` row removed and only one copy
 #'   of each `every_dups` row.
 #'
-find_dups <- function (df, id_cols) {
-
+find_dups <- function(df, id_cols) {
   # duplicates that match on every column
   every_dups <- df %>%
     dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
@@ -153,15 +154,17 @@ find_dups <- function (df, id_cols) {
     dplyr::anti_join(dplyr::select(every_dups, -c(n))) %>%
     dplyr::group_by(dplyr::across(tidyselect::all_of(id_cols))) %>%
     dplyr::mutate(n = dplyr::row_number()) %>%
-    dplyr::filter(max(n, na.rm= T) > 1) %>%
+    dplyr::filter(max(n, na.rm = T) > 1) %>%
     dplyr::mutate(n = max(n, na.rm = T)) %>%
     dplyr::ungroup() %>%
     dplyr::relocate(n, .after = id_cols[length(id_cols)])
 
   # check for id columns with NA values
   id_NA <- df %>%
-    dplyr::filter(dplyr::if_any(.cols = tidyselect::all_of(id_cols),
-                                ~ is.na(.)))
+    dplyr::filter(dplyr::if_any(
+      .cols = tidyselect::all_of(id_cols),
+      ~ is.na(.)
+    ))
 
   # data frame with duplicates removed:
   #  * ID duplicates are removed because they have other discrepancies
@@ -197,8 +200,7 @@ find_dups <- function (df, id_cols) {
 #'
 #' @returns a list returned by [compareDF::compare_df()]
 #'
-compareDF_custom <- function (c1, c2, id_cols, tolerance = 0.00001) {
-
+compareDF_custom <- function(c1, c2, id_cols, tolerance = 0.00001) {
   # make round_output_to match the tolerance
   if (tolerance > 1) {
     rnd <- 1
@@ -209,13 +211,14 @@ compareDF_custom <- function (c1, c2, id_cols, tolerance = 0.00001) {
   }
 
   comp <- compareDF::compare_df(c1,
-                                c2,
-                                group_col = id_cols,
-                                tolerance_type = "difference",
-                                tolerance = tolerance,
-                                stop_on_error = FALSE,
-                                keep_unchanged_rows = TRUE,
-                                round_output_to = rnd)
+    c2,
+    group_col = id_cols,
+    tolerance_type = "difference",
+    tolerance = tolerance,
+    stop_on_error = FALSE,
+    keep_unchanged_rows = TRUE,
+    round_output_to = rnd
+  )
   return(comp)
 }
 
@@ -228,12 +231,10 @@ compareDF_custom <- function (c1, c2, id_cols, tolerance = 0.00001) {
 #' [compareDF_custom()] output
 #' @returns
 #'
-segregate_compare <- function (comp_comparison_df) {
-
+segregate_compare <- function(comp_comparison_df) {
   all_dat <- comp_comparison_df %>%
     dplyr::group_by(grp) %>%
     dplyr::mutate(n = dplyr::row_number(), .after = "grp") %>%
-
     # mark which row came from what data frame
     dplyr::mutate(
       data_from = dplyr::case_when(
@@ -248,7 +249,6 @@ segregate_compare <- function (comp_comparison_df) {
     ) %>%
     dplyr::select(-n) %>%
     dplyr::relocate(data_from, .after = chng_type) %>%
-
     # check for unhandled cases
     {
       if (any(is.na(.$data_from))) {
@@ -257,7 +257,6 @@ segregate_compare <- function (comp_comparison_df) {
         .
       }
     } %>%
-
     # mark whether a pure addition, deletion, or change
     dplyr::mutate(
       change_type = dplyr::case_when(
@@ -270,7 +269,6 @@ segregate_compare <- function (comp_comparison_df) {
     ) %>%
     dplyr::relocate(change_type, .after = data_from) %>%
     dplyr::select(-chng_type) %>%
-
     # check for unhandled cases
     {
       if (any(is.na(.$change_type))) {
@@ -279,7 +277,6 @@ segregate_compare <- function (comp_comparison_df) {
         .
       }
     } %>%
-
     dplyr::ungroup()
 
   # split into additions, deletions, and changes data sets
@@ -294,13 +291,16 @@ segregate_compare <- function (comp_comparison_df) {
   # create alternate left/right view for changes
   chng_old <- chng %>%
     dplyr::filter(data_from == "old") %>%
-    dplyr::select(-c(data_from,
-                     change_type,
-                     grp,
-                     tidyselect::all_of(id_cols))
-    ) %>%
-    dplyr::rename_with(.cols = tidyselect::everything(),
-                       ~ paste0(., ".old"))
+    dplyr::select(-c(
+      data_from,
+      change_type,
+      grp,
+      tidyselect::all_of(id_cols)
+    )) %>%
+    dplyr::rename_with(
+      .cols = tidyselect::everything(),
+      ~ paste0(., ".old")
+    )
 
   chng_new <- chng %>%
     dplyr::filter(data_from == "new") %>%
@@ -310,7 +310,7 @@ segregate_compare <- function (comp_comparison_df) {
     purrr::map(\(x) rep(x, 2)) %>%
     unlist() %>%
     purrr::imap(\(x, idx) {
-      if (idx %% 2 == 1){
+      if (idx %% 2 == 1) {
         stringr::str_remove(x, "\\.old")
       } else {
         x
@@ -320,10 +320,12 @@ segregate_compare <- function (comp_comparison_df) {
 
   chng_lr <- chng_new %>%
     dplyr::bind_cols(chng_old) %>%
-    dplyr::select(grp,
-                  change_type,
-                  tidyselect::all_of(id_cols),
-                  tidyselect::all_of(new_col_order))
+    dplyr::select(
+      grp,
+      change_type,
+      tidyselect::all_of(id_cols),
+      tidyselect::all_of(new_col_order)
+    )
 
   return(
     list(
@@ -354,30 +356,31 @@ segregate_compare <- function (comp_comparison_df) {
 #' @returns a data frame with three columns: `Rows`, `New data`, `Old data`
 #' @export
 #'
-summarize_compare_rows <- function (c1,
-                                    c2,
-                                    adds,
-                                    dels,
-                                    chng_lr,
-                                    unchng,
-                                    dup_list1,
-                                    dup_list2,
-                                    id_cols) {
-
+summarize_compare_rows <- function(c1,
+                                   c2,
+                                   adds,
+                                   dels,
+                                   chng_lr,
+                                   unchng,
+                                   dup_list1,
+                                   dup_list2,
+                                   id_cols) {
   all_val_dup_cnt1 <- sum(dup_list1$every_dups$n)
   all_val_dup_cnt2 <- sum(dup_list2$every_dups$n)
 
   id_dup_row_cnt1 <- dup_list1$id_dups %>%
     dplyr::select(tidyselect::all_of(id_cols), n) %>%
     dplyr::distinct(dplyr::across(tidyselect::all_of(id_cols)),
-                    .keep_all = T) %>%
+      .keep_all = T
+    ) %>%
     dplyr::pull(n) %>%
     sum()
 
   id_dup_row_cnt2 <- dup_list2$id_dups %>%
     dplyr::select(tidyselect::all_of(id_cols), n) %>%
     dplyr::distinct(dplyr::across(tidyselect::all_of(id_cols)),
-                    .keep_all = T) %>%
+      .keep_all = T
+    ) %>%
     dplyr::pull(n) %>%
     sum()
 
@@ -385,17 +388,16 @@ summarize_compare_rows <- function (c1,
   id_na_cnt2 <- nrow(dup_list2$id_NA)
 
   summ_df <- tibble::tribble(
-    ~ `Rows`               , ~ `New data`      , ~ `Old data`,
-    "Total"                , nrow(c1)          , nrow(c2)          ,
-    "Added"                , nrow(adds)        , NA_real_          ,
-    "Deleted"              , NA_real_          , nrow(dels)        ,
-    "Changed"              , nrow(chng_lr)     , nrow(chng_lr)     ,
-    "Unchanged"            , nrow(unchng)      , nrow(unchng)      ,
-    "All values duplicated", all_val_dup_cnt1  , all_val_dup_cnt2  ,
-    "Only IDs duplicated"  , id_dup_row_cnt1   , id_dup_row_cnt2   ,
-    "`NA` ID values"       , id_na_cnt1        , id_na_cnt2
+    ~`Rows`, ~`New data`, ~`Old data`,
+    "Total", nrow(c1), nrow(c2),
+    "Added", nrow(adds), NA_real_,
+    "Deleted", NA_real_, nrow(dels),
+    "Changed", nrow(chng_lr), nrow(chng_lr),
+    "Unchanged", nrow(unchng), nrow(unchng),
+    "All values duplicated", all_val_dup_cnt1, all_val_dup_cnt2,
+    "Only IDs duplicated", id_dup_row_cnt1, id_dup_row_cnt2,
+    "`NA` ID values", id_na_cnt1, id_na_cnt2
   )
 
   return(summ_df)
 }
-
