@@ -1,0 +1,11 @@
+Package: compareDFx
+Title: Compare Data Frame Versions, a CompareDF Extension
+Version: 0.0.0.9000
+Authors@R: 
+    person("Stephen", "Knapp", , "stephen@knappconsultingllc.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5101-4555"))
+Description: Compares two data frames with a detailed Excel report
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
