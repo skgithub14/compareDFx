@@ -9,10 +9,11 @@ summarize_compare_rows(
   df2,
   adds,
   dels,
-  chng_lr,
+  changed_lr,
   matched,
-  dup_list1,
-  dup_list2,
+  exact_dups,
+  id_dups,
+  id_NA,
   id_cols
 )
 }
@@ -23,12 +24,17 @@ summarize_compare_rows(
 
 \item{dels}{data frame of deletions (in \code{df2} but not in \code{df1})}
 
-\item{chng_lr}{data frame of changes in the left/right layout so that there
+\item{changed_lr}{data frame of changes in the left/right layout so that there
 is one row per change, not two}
 
 \item{matched}{data frame of unchanged rows where duplicates have been removed}
 
-\item{dup_list1, dup_list2}{lists output from \code{\link[=find_dups]{find_dups()}}}
+\item{exact_dups}{an \code{exact_dups} list element returned from
+\code{\link[=segregate_compare]{segregate_compare()}}}
+
+\item{id_dups}{an \code{id_dups} list element returned from \code{\link[=segregate_compare]{segregate_compare()}}}
+
+\item{id_NA}{an \code{id_NA} list element returned from \code{\link[=segregate_compare]{segregate_compare()}}}
 
 \item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
 }

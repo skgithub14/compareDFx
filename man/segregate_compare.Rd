@@ -4,15 +4,66 @@
 \alias{segregate_compare}
 \title{Segregates data frame comparisons by type}
 \usage{
-segregate_compare(comparison_df, id_cols)
+segregate_compare(
+  comparison_df,
+  comparison_table_diff,
+  id_cols,
+  cc_out,
+  df1_exact_dups,
+  df2_exact_dups,
+  df1_id_dups,
+  df2_id_dups,
+  df1_id_NA,
+  df2_id_NA,
+  standard_col_list,
+  df1,
+  df2
+)
 }
 \arguments{
-\item{comparison_df}{the \code{comparison_df} element of a \code{\link[=compare_dfx]{compare_dfx()}}
+\item{comparison_df}{the \code{comparison_df} element of a \code{\link[=compare_df_wrapper]{compare_df_wrapper()}}
 output}
 
+\item{comparison_table_diff}{the \code{comparison_table_diff} element of a
+\code{\link[=compare_df_wrapper]{compare_df_wrapper()}} output}
+
 \item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+
+\item{cc_out}{a list output from \code{\link[=compare_col]{compare_col()}}}
+
+\item{df1_exact_dups, df2_exact_dups}{an \code{exact_dups} list element from a
+\code{\link[=find_dups]{find_dups()}} output, for \code{df1} and \code{df2}, respectively}
+
+\item{df1_id_dups, df2_id_dups}{an \code{id_dups} list element from a \code{\link[=find_dups]{find_dups()}}
+output, for \code{df1} and \code{df2}, respectively}
+
+\item{df1_id_NA, df2_id_NA}{an \code{id_NA} list element from a \code{\link[=find_dups]{find_dups()}}
+output, for \code{df1} and \code{df2}, respectively}
+
+\item{standard_col_list}{a list returned from \code{\link[=standardize_col_order]{standardize_col_order()}}}
+
+\item{df1, df2}{data frames to compare}
+}
+\value{
+a named list of data frames with elements:
+\itemize{
+\item \code{col_summary_simple}: high level summary statistics of columns
+\item \code{col_summary_by_col}: comparison summary statistics by column name
+\item \code{row_summary}: comparison summary statistics by row
+\item \code{all}: A data from the other list elements in one data frame
+\item \code{matched}: matching rows
+\item \code{adds}: added rows
+\item \code{dels}: deleted rows
+\item \code{changed}: changed rows, top-bottom view
+\item \code{changed_lr}: changed rows, left-right view
+\item \code{exact_dups}: exact duplicate rows
+\item \code{id_dups}: ID duplicate rows
+\item \code{id_NA}: Rows with with \code{NA} ID values
+\item \code{df1}: The original df1
+\item \code{df2}: The original df2
+}
 }
 \description{
-Splits the output of \code{\link[=compare_dfx]{compare_dfx()}} in several smaller data frames
+Splits the output of \code{\link[=compare_df_wrapper]{compare_df_wrapper()}} in several smaller data frames
 organized by type of change and formats it
 }
