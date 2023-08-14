@@ -16,9 +16,9 @@ summarize_compare_cols(
 \arguments{
 \item{df1, df2}{data frames to compare}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 
-\item{cc_out}{a list output from \code{\link[=compare_col]{compare_col()}}}
+\item{cc_out}{a list output from \code{\link[=compare_cols]{compare_cols()}}}
 
 \item{df_standard_cols}{a list returned from \code{\link[=standardize_col_order]{standardize_col_order()}}}
 

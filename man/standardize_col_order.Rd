@@ -9,7 +9,7 @@ standardize_col_order(df1, df2, id_cols)
 \arguments{
 \item{df1, df2}{data frames to compare}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
 a list with two elements:

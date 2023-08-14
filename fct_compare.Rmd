@@ -179,7 +179,8 @@ df2
 # compare data frames on de-duplicated data only
 comp <- compare_df_wrapper(dup_list1$no_dups, 
                            dup_list2$no_dups, 
-                           id_cols)
+                           id_cols,
+                           tolerance = 0.00001)
 comp$comparison_df
 comp$comparison_table_diff
 ```
@@ -221,9 +222,14 @@ get_comparison(df1, df2, id_cols)
 #' @param path a string, path of the Excel file to be written
 #' @param comparison a list returned from [get_comparison()]
 #' 
-#' @returns 
+#' @returns nothing
 #' @export
-
+#' 
+create_comparison_excel <- function (path, comparison) {
+  
+  
+  
+}
 ```
 
 

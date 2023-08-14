@@ -41,8 +41,8 @@ compare_cols <- function(df1, df2) {
 #' both data frames have the same column order.
 #'
 #' @inheritParams compare_cols
-#' @param cc_out a list output from [compare_col()]
-#' @param id_cols a character vector of id columns output from [get_uid_cols()]
+#' @param cc_out a list output from [compare_cols()]
+#' @param id_cols a character vector of id columns output from [compare_cols()]
 #'
 #' @returns a named list with two elements:
 #'  * `df1`: the modified `df1` data frame
@@ -236,7 +236,7 @@ find_dups <- function(df, id_cols, source) {
 compare_df_wrapper <- function(df1_no_dups,
                                df2_no_dups,
                                id_cols,
-                               tolerance = 0.00001) {
+                               tolerance) {
 
   # make round_output_to match the tolerance
   if (tolerance > 1) {
@@ -692,7 +692,7 @@ summarize_compare_cols <- function (df1,
 
   # column classes df1
   col_class1 <- colnames(df_standard_cols$df1) %>%
-    setNames(colnames(df_standard_cols$df1)) %>%
+    stats::setNames(colnames(df_standard_cols$df1)) %>%
     purrr::imap(\(x, idx) {
       if (idx %in% cc_out$df2_only) {
         NA_character_
@@ -704,7 +704,7 @@ summarize_compare_cols <- function (df1,
 
   # column classes df2
   col_class2 <- colnames(df_standard_cols$df2) %>%
-    setNames(colnames(df_standard_cols$df2)) %>%
+    stats::setNames(colnames(df_standard_cols$df2)) %>%
     purrr::imap(\(x, idx) {
       if (idx %in% cc_out$df1_only) {
         NA_character_
@@ -759,28 +759,38 @@ summarize_compare_cols <- function (df1,
 #' @param df1,df2 data frames to compare
 #' @param id_cols the column names in `df1` and `df2` that make up a unique ID
 #' @param tolerance the amount by which two numbers can differ to be considered
-#'  equal
+#'  equal, default is `0.00001`
 #'
 #' @inherit segregate_compare return
-get_comparison <- function(df1, df2, id_cols) {
+get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
 
   # compare the column names
-  cc_out <- compare_cols(df1, df2)
+  cc_out <- compare_cols(df1 = df1, df2 = df2)
 
   # if there were different columns, add dummy columns as needed
-  df_list <- insert_dummy_cols(df1, df2, cc_out, id_cols)
+  df_list <- insert_dummy_cols(df1 = df1,
+                               df2 = df2,
+                               cc_out = cc_out,
+                               id_cols = id_cols)
 
   # standardize the order of the columns
-  standard_cols <- standardize_col_order(df_list$df1, df_list$df2, id_cols)
+  standard_cols <- standardize_col_order(df1 = df_list$df1,
+                                         df2 = df_list$df2,
+                                         id_cols = id_cols)
 
   # separate out exact duplicates, ID only duplicates, and IDs with NA
-  dup_list1 <- find_dups(standard_cols$df1, id_cols, source = "df1")
-  dup_list2 <- find_dups(standard_cols$df2, id_cols, source = "df2")
+  dup_list1 <- find_dups(df = standard_cols$df1,
+                         id_cols = id_cols,
+                         source = "df1")
+  dup_list2 <- find_dups(df = standard_cols$df2,
+                         id_cols = id_cols,
+                         source = "df2")
 
   # compare data frames on de-duplicated data
-  comp <- compare_df_wrapper(dup_list1$no_dups,
-                             dup_list2$no_dups,
-                             id_cols)
+  comp <- compare_df_wrapper(df1_no_dups = dup_list1$no_dups,
+                             df2_no_dups = dup_list2$no_dups,
+                             id_cols = id_cols,
+                             tolerance = tolerance)
 
   return(
     segregate_compare(comparison_df = comp$comparison_df,

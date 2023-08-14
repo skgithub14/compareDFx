@@ -9,9 +9,9 @@ insert_dummy_cols(df1, df2, cc_out, id_cols)
 \arguments{
 \item{df1, df2}{data frames to compare}
 
-\item{cc_out}{a list output from \code{\link[=compare_col]{compare_col()}}}
+\item{cc_out}{a list output from \code{\link[=compare_cols]{compare_cols()}}}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
 a named list with two elements:

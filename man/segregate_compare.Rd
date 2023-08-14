@@ -27,9 +27,9 @@ output}
 \item{comparison_table_diff}{the \code{comparison_table_diff} element of a
 \code{\link[=compare_df_wrapper]{compare_df_wrapper()}} output}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 
-\item{cc_out}{a list output from \code{\link[=compare_col]{compare_col()}}}
+\item{cc_out}{a list output from \code{\link[=compare_cols]{compare_cols()}}}
 
 \item{df1_exact_dups, df2_exact_dups}{an \code{exact_dups} list element from a
 \code{\link[=find_dups]{find_dups()}} output, for \code{df1} and \code{df2}, respectively}

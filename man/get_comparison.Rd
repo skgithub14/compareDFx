@@ -4,7 +4,7 @@
 \alias{get_comparison}
 \title{Compare two data frames}
 \usage{
-get_comparison(df1, df2, id_cols)
+get_comparison(df1, df2, id_cols, tolerance = 1e-05)
 }
 \arguments{
 \item{df1, df2}{data frames to compare}
@@ -12,7 +12,7 @@ get_comparison(df1, df2, id_cols)
 \item{id_cols}{the column names in \code{df1} and \code{df2} that make up a unique ID}
 
 \item{tolerance}{the amount by which two numbers can differ to be considered
-equal}
+equal, default is \code{0.00001}}
 }
 \value{
 a named list of data frames with elements:

@@ -36,7 +36,7 @@ is one row per change, not two}
 
 \item{id_NA}{an \code{id_NA} list element returned from \code{\link[=segregate_compare]{segregate_compare()}}}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
 a data frame with three columns: \code{Rows}, \verb{df1 data}, \verb{df2 data}

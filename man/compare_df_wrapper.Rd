@@ -4,13 +4,13 @@
 \alias{compare_df_wrapper}
 \title{Compare two data frames using \code{\link[compareDF:compare_df]{compareDF::compare_df()}}}
 \usage{
-compare_df_wrapper(df1_no_dups, df2_no_dups, id_cols, tolerance = 1e-05)
+compare_df_wrapper(df1_no_dups, df2_no_dups, id_cols, tolerance)
 }
 \arguments{
 \item{df1_no_dups, df2_no_dups}{a \code{no_dups} list element from a \code{\link[=find_dups]{find_dups()}}
 output, for \code{df1} and \code{df2}, respectively}
 
-\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 
 \item{tolerance}{amount by which numeric values can vary and still be
 considered equal (helps reduce machine rounding errors false positive
