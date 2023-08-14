@@ -4,10 +4,10 @@
 \alias{insert_dummy_cols}
 \title{Force two data frames to have the same columns by creating dummy columns}
 \usage{
-insert_dummy_cols(c1, c2, cc_out, id_cols)
+insert_dummy_cols(df1, df2, cc_out, id_cols)
 }
 \arguments{
-\item{c1, c2}{data frames to compare}
+\item{df1, df2}{data frames to compare}
 
 \item{cc_out}{a list output from \code{\link[=compare_col]{compare_col()}}}
 
@@ -16,8 +16,8 @@ insert_dummy_cols(c1, c2, cc_out, id_cols)
 \value{
 a named list with two elements:
 \itemize{
-\item \code{c1}: the modified \code{c1} data frame
-\item \code{c2}: the modified \code{c2} data frame
+\item \code{df1}: the modified \code{df1} data frame
+\item \code{df2}: the modified \code{df2} data frame
 }
 }
 \description{

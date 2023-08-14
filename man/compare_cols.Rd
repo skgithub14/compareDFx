@@ -4,18 +4,18 @@
 \alias{compare_cols}
 \title{Compare column names of two data frames to find differences}
 \usage{
-compare_cols(c1, c2)
+compare_cols(df1, df2)
 }
 \arguments{
-\item{c1, c2}{data frames to compare}
+\item{df1, df2}{data frames to compare}
 }
 \value{
 a named list with 4 elements:
 \itemize{
-\item \code{same}: a logical indicating whether \code{c1} and \code{c2} have the same columns
-\item \code{both}: a character vector with the column names in both \code{c1} and \code{c2}
-\item \code{c1_only}: a character vector with the column names only in \code{c1}
-\item \code{c2_only}: a character vector with the column names only in \code{c2}
+\item \code{same}: a logical indicating whether \code{df1} and \code{df2} have the same columns
+\item \code{both}: a character vector with the column names in both \code{df1} and \code{df2}
+\item \code{df1_only}: a character vector with the column names only in \code{df1}
+\item \code{df2_only}: a character vector with the column names only in \code{df2}
 }
 }
 \description{

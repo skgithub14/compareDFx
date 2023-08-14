@@ -5,35 +5,35 @@
 \title{Summary metrics for data frame comparison by rows}
 \usage{
 summarize_compare_rows(
-  c1,
-  c2,
+  df1,
+  df2,
   adds,
   dels,
   chng_lr,
-  unchng,
+  matched,
   dup_list1,
   dup_list2,
   id_cols
 )
 }
 \arguments{
-\item{c1, c2}{data frames to compare}
+\item{df1, df2}{data frames to compare}
 
-\item{adds}{data frame of additions from \code{c1}}
+\item{adds}{data frame of additions from \code{df1}}
 
-\item{dels}{data frame of deletions (in \code{c2} but not in \code{c1})}
+\item{dels}{data frame of deletions (in \code{df2} but not in \code{df1})}
 
 \item{chng_lr}{data frame of changes in the left/right layout so that there
 is one row per change, not two}
 
-\item{unchng}{data frame of unchanged rows where duplicates have been removed}
+\item{matched}{data frame of unchanged rows where duplicates have been removed}
 
 \item{dup_list1, dup_list2}{lists output from \code{\link[=find_dups]{find_dups()}}}
 
 \item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
 }
 \value{
-a data frame with three columns: \code{Rows}, \verb{New data}, \verb{Old data}
+a data frame with three columns: \code{Rows}, \verb{df1 data}, \verb{df2 data}
 }
 \description{
 Produces a table of high level summary statistics for comparing two data

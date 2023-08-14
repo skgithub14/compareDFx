@@ -4,25 +4,27 @@
 \alias{find_dups}
 \title{Separate duplicated data frame rows from rows with no duplicates}
 \usage{
-find_dups(df, id_cols)
+find_dups(df, id_cols, source)
 }
 \arguments{
 \item{df}{a data frame with or without duplicated rows}
 
 \item{id_cols}{a character vector of the column names that form a unique ID}
+
+\item{source}{a string, name of the data source (usually \code{"df1"} or \code{"df2"})}
 }
 \value{
 a names list with four elements:
 \itemize{
-\item \code{every_dups}: rows which were duplicated for every value, there will be
-one distinct row in \code{every_dups} for each case and the column \code{n} will
+\item \code{exact_dups}: rows which were duplicated for every value, there will be
+one distinct row in \code{exact_dups} for each case and the column \code{n} will
 list how many occurences of the row were in \code{df}.
 \item \code{id_dups}: rows which were duplicated based on \code{id_cols} but had other
 values that differed, the column \code{n} contains how many ID duplicates of
 one ID exist in \code{df}
 \item \code{id_NA}: rows which had an \code{NA} value in a \code{id_cols} column
 \item \code{no_dups}: this is \code{df} with all \code{id_dups} row removed and only one copy
-of each \code{every_dups} row.
+of each \code{exact_dups} row.
 }
 }
 \description{

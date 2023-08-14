@@ -5,25 +5,12 @@ output: html_notebook
 
 ## Workflow
 
-```{r}
-library(magrittr)
-```
-
 
 ```{r}
+## create test fixtures
+
 # get id cols
-# file_type <- "condition"
-# uid_type <- "Sort"
-# id_cols <- get_uid_cols(file_type, uid_type)
 id_cols <- c("id1", "id2")
-```
-
-```{r}
-# create test fixtures
-# modify c1 and c2
-# setwd("..")
-# c1 <- load_test_file("c")
-# c2 <- load_test_file("c")
 
 base <- tibble::tibble(
   id1  = 1:4,
@@ -35,9 +22,9 @@ base <- tibble::tibble(
   date = as.Date(c("2023-01-01", NA_character_, "2023-01-03", "2023-01-04"))
 )
 
-c1 <- base %>%
+df1 <- base %>%
   
-  # add a row not in c2
+  ## create ID duplicates
   dplyr::add_row(
     id1  = 5,
     id2  = "E",
@@ -47,13 +34,31 @@ c1 <- base %>%
     log  = FALSE,
     date = as.Date("2023-01-05")
   ) %>%
-  
-  # duplicate the added row with a different value
   dplyr::add_row(
     id1  = 5,
     id2  = "E", 
     num  = 5,
     char = "g", # this value is different
+    int  = 5L,
+    log  = FALSE,
+    date = as.Date("2023-01-05")
+  ) %>%
+  
+  ## create exact duplicate, and row that is not in df2
+  dplyr::add_row(
+    id1  = 5,
+    id2  = "Z",
+    num  = 5,
+    char = "e",
+    int  = 5L,
+    log  = FALSE,
+    date = as.Date("2023-01-05")
+  ) %>%
+  dplyr::add_row(
+    id1  = 5,
+    id2  = "Z",
+    num  = 5,
+    char = "e",
     int  = 5L,
     log  = FALSE,
     date = as.Date("2023-01-05")
@@ -70,22 +75,22 @@ c1 <- base %>%
     date = as.Date("2023-01-05")
   ) %>%
   
-  # # add a column not in c2
+  # # add a column not in df2
   # dplyr::mutate(extra1 = rep(1, 6)) %>%
   
-  # add columns with same names and values as c2 but with different classes
-  dplyr::mutate(class_num_char = rep(100, 7)) %>%
-  dplyr::mutate(class_num_log = rep(NA_real_, 7)) %>%
+  # add columns with same names and values as df2 but with different classes
+  dplyr::mutate(class_num_char = rep(100, 9)) %>%
+  dplyr::mutate(class_num_log = rep(NA_real_, 9)) %>%
 
   # make a column to look at differences in decimal places and tolerance
   dplyr::mutate(
-    dec_diff_ref = rep(1, 7),
-    dec_diff = rep(1, 7),
+    dec_diff_ref = rep(1, 9),
+    dec_diff = rep(1, 9),
   )
 
-c2 <- base %>%
+df2 <- base %>%
   
-  # add a row not in c1
+  # add a row not in df1
   dplyr::add_row(
     id1  = 6,
     id2  = "F",
@@ -101,10 +106,10 @@ c2 <- base %>%
   dplyr::bind_rows(base[1, ]) %>%
   dplyr::arrange(id1, id2) %>%
   
-  # # add a column not in c1
+  # # add a column not in df1
   # dplyr::mutate(extra2 = rep(2, 7))  %>%
   
-  # add columns with same names and values as c1 but with different classes
+  # add columns with same names and values as df1 but with different classes
   dplyr::mutate(class_num_char = rep("100", 7)) %>%
   dplyr::mutate(class_num_log = rep(NA, 7)) %>%
   
@@ -114,42 +119,40 @@ c2 <- base %>%
     dec_diff = 1 - dec_diff_ref
   )
   
-c1
-c2
+df1
+df2
+```
+
+```{r}
+# check if there are different columns
+(cc_out <- compare_cols(df1, df2))
+```
+
+```{r}
+# if there were different columns, add dummy columns as needed
+(df_list <- insert_dummy_cols(df1, df2, cc_out, id_cols))
 ```
 
 
 ```{r}
-# check if there are different columns
-cc_out <- compare_cols(c1, c2)
-
-# if there were different columns, add dummy columns as needed
-c_list <- insert_dummy_cols(c1, c2, cc_out, id_cols)
-
 # order columns
-# c_list <- standardize_col_order(c_list$c1, c_list$c2, id_cols)
-c1_s <- dplyr::select(c_list$c1, 
-                      tidyselect::starts_with("id"), 
-                      dec_diff_ref, dec_diff,
-                      num, char, int, log, date, 
-                      class_num_char, class_num_log
-                      # , tidyselect::starts_with("extra")
-                      )
-c2_s <- dplyr::select(c_list$c2, tidyselect::all_of(colnames(c1_s)))
-c1_s
-c2_s
+(df_list1 <- standardize_col_order(df_list$df1, df_list$df2, id_cols))
 ```
 
 ```{r}
 # find duplicates
-(dup_list1 <- find_dups(c1_s, id_cols))
-(dup_list2 <- find_dups(c2_s, id_cols))
+(dup_list1 <- find_dups(df_list1$df1, id_cols, source = "df1"))
+(dup_list2 <- find_dups(df_list1$df2, id_cols, source = "df2"))
 ```
 
 
 ```{r}
 # compare data frames on de-duplicated data only
-comp <- compareDF_custom(dup_list1$no_dups, dup_list2$no_dups, id_cols)
+comp <- compare_dfx(dup_list1$no_dups, 
+                    dup_list2$no_dups, 
+                    dup_list1$exact_dups,
+                    dup_list2$exact_dups,
+                    id_cols)
 comp$comparison_df
 comp$comparison_table_diff
 ```
@@ -157,7 +160,7 @@ comp$comparison_table_diff
 
 ```{r}
 # segregate the comparison and format the results
-comp_list <- segregate_compare(comp$comparison_df)
+comp_list <- segregate_compare(comp$comparison_df, id_cols)
 comp_list
 ```
 
@@ -165,12 +168,12 @@ comp_list
 
 ```{r}
 # summarize differences between new and old
-summarize_compare_rows(c1, 
-                       c2, 
+summarize_compare_rows(df1, 
+                       df2, 
                        comp_list$adds, 
                        comp_list$dels, 
                        comp_list$chng_lr, 
-                       comp_list$unchng, 
+                       comp_list$matched, 
                        dup_list1, 
                        dup_list2,
                        id_cols)
@@ -191,15 +194,15 @@ summarize_compare_rows(c1,
 #' @inheritParams compare_cols
 #' @inheritParams insert_dummy_cols
 #' @param comp_comparison_table_diff the `comparison_table_diff` element of a 
-#' [compareDF::compare_df()] or [compareDF_custom()] output.
+#' [compareDF::compare_df()] or [compare_dfx()] output.
 #' 
 #' @returns a named list containing two data frames:
 #'  * `report_simple` a data frame with higher level summary statistics
 #'  * `report_by_col` a data frame that lists summary statistics by column name
 #' @export
 #' 
-summarize_compare_cols <- function (c1, 
-                                    c2, 
+summarize_compare_cols <- function (df1, 
+                                    df2, 
                                     cc_out, 
                                     id_cols, 
                                     comp_comparison_table_diff) {
@@ -208,14 +211,14 @@ summarize_compare_cols <- function (c1,
     dplyr::select(-c(grp, chng_type)) %>%
     apply(2, function(x) sum(x == "+"))
   
-  col_class1 <- colnames(c1) %>%
-    setNames(colnames(c1)) %>%
-    purrr::map(\(x) class(c1[[x]])) %>%
+  col_class1 <- colnames(df1) %>%
+    setNames(colnames(df1)) %>%
+    purrr::map(\(x) class(df1[[x]])) %>%
     unlist()
   
-  col_class2 <- colnames(c2) %>%
-    setNames(colnames(c2)) %>%
-    purrr::map(\(x) class(c2[[x]])) %>%
+  col_class2 <- colnames(df2) %>%
+    setNames(colnames(df2)) %>%
+    purrr::map(\(x) class(df2[[x]])) %>%
     unlist()
   
   col_class_diff_cnt <- sum(col_class1 != col_class2)
@@ -223,7 +226,7 @@ summarize_compare_cols <- function (c1,
   # report comparing new to old
   report_simple <- tibble::tribble(
     ~ Columns          , ~ New             , ~ Old             ,
-    "Total"            , ncol(c1)          , ncol(c2)          ,
+    "Total"            , ncol(df1)          , ncol(df2)          ,
     "Changed"          , col_chng_cnts     , col_chng_cnts     ,
     "Different classes", col_class_diff_cnt, col_class_diff_cnt,
   )

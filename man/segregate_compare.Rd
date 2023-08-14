@@ -4,13 +4,15 @@
 \alias{segregate_compare}
 \title{Segregates data frame comparisons by type}
 \usage{
-segregate_compare(comp_comparison_df)
+segregate_compare(comparison_df, id_cols)
 }
 \arguments{
-\item{comp_comparison_df}{the \code{comparison_df} element of a
-\code{\link[=compareDF_custom]{compareDF_custom()}} output}
+\item{comparison_df}{the \code{comparison_df} element of a \code{\link[=compare_dfx]{compare_dfx()}}
+output}
+
+\item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
 }
 \description{
-Splits the output of \code{\link[=compareDF_custom]{compareDF_custom()}} in several smaller data frames
+Splits the output of \code{\link[=compare_dfx]{compare_dfx()}} in several smaller data frames
 organized by type of change and formats it
 }

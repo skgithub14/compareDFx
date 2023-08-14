@@ -4,18 +4,18 @@
 \alias{standardize_col_order}
 \title{Standardize column order}
 \usage{
-standardize_col_order(c1, c2, id_cols)
+standardize_col_order(df1, df2, id_cols)
 }
 \arguments{
-\item{c1, c2}{data frames to compare}
+\item{df1, df2}{data frames to compare}
 
 \item{id_cols}{a character vector of id columns output from \code{\link[=get_uid_cols]{get_uid_cols()}}}
 }
 \value{
 a list with two elements:
 \itemize{
-\item \code{c1}: a modified data frame \code{c1}
-\item \code{c2}: a modified data frame \code{c2}
+\item \code{df1}: a modified data frame \code{df1}
+\item \code{df2}: a modified data frame \code{df2}
 }
 }
 \description{
