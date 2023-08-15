@@ -27,10 +27,20 @@ create_comparison_excel <- function (comparison,
                                        valign = "center",
                                        textDecoration = "bold",
                                        fgFill = "#b3d9e5")
+  headerLeftStyle <- openxlsx::createStyle(border = "TopBottomLeftRight",
+                                           wrapText = TRUE,
+                                           halign = "left",
+                                           valign = "center",
+                                           textDecoration = "bold",
+                                           fgFill = "#b3d9e5")
   generalStyle <- openxlsx::createStyle(border = "TopBottomLeftRight",
                                         wrapText = TRUE,
                                         halign = "center",
                                         valign = "center")
+  generalLeftStyle <- openxlsx::createStyle(border = "TopBottomLeftRight",
+                                            wrapText = TRUE,
+                                            halign = "left",
+                                            valign = "center")
   additionStyle <- openxlsx::createStyle(border = "TopBottomLeftRight",
                                          wrapText = TRUE,
                                          halign = "center",
@@ -54,31 +64,61 @@ create_comparison_excel <- function (comparison,
   openxlsx::addWorksheet(wb, sheetName = summary_sname)
   openxlsx::setColWidths(wb,
                          sheet = summary_sname,
-                         cols = 1:ncol(comparison$col_summary_simple),
-                         widths = "auto")
+                         cols = 1:ncol(comparison$row_summary),
+                         widths = c(15, 5, 5, 65, 65))
+
+  # one sentence summary
+  if (all(comparison$all$discrepancy == "matched")) {
+    overall <- "Summary: df1 and df2 matched on all records!!!"
+    summaryStatementStyle <- openxlsx::createStyle(fontColour = "#006100",
+                                                   fgFill = "#C6EFCE",
+                                                   textDecoration = "bold",
+                                                   fontSize = 16)
+  } else {
+    overall <- "Summary: df1 and df2 have different records and/or non-unique records"
+    summaryStatementStyle <- openxlsx::createStyle(fontColour = "#9C0006",
+                                                   fgFill = "#FFC7CE",
+                                                   textDecoration = "bold",
+                                                   fontSize = 16)
+  }
+  openxlsx::writeData(wb,
+                      sheet = summary_sname,
+                      overall,
+                      startRow = 1)
+  openxlsx::addStyle(wb,
+                     sheet = summary_sname,
+                     style = summaryStatementStyle,
+                     rows = 1,
+                     cols = 1:ncol(comparison$row_summary),
+                     gridExpand = TRUE)
+  openxlsx::mergeCells(wb, sheet = summary_sname, cols = 5, rows = 1)
+
+  # column simple summary
   openxlsx::writeData(wb,
                       sheet = summary_sname,
                       comparison$col_summary_simple,
-                      startRow = 1,
-                      headerStyle = headerStyle)
+                      startRow = 3,
+                      headerStyle = headerLeftStyle)
   openxlsx::addStyle(wb,
                      sheet = summary_sname,
-                     style = generalStyle,
-                     rows = 2:(nrow(comparison$col_summary_simple) + 1),
+                     style = generalLeftStyle,
+                     rows = 4:(nrow(comparison$col_summary_simple) + 3),
                      cols = 1:ncol(comparison$col_summary_simple),
                      gridExpand = TRUE)
+
+  # row summary
   openxlsx::writeData(wb,
                       sheet = summary_sname,
                       comparison$row_summary,
-                      startRow = nrow(comparison$col_summary_simple) + 3,
-                      headerStyle = headerStyle)
+                      startRow = nrow(comparison$col_summary_simple) + 5,
+                      headerStyle = headerLeftStyle)
   openxlsx::addStyle(wb,
                      sheet = summary_sname,
-                     style = generalStyle,
-                     rows = seq(nrow(comparison$col_summary_simple) + 4,
-                                nrow(comparison$col_summary_simple) + 3 +
+                     style = generalLeftStyle,
+                     rows = seq(nrow(comparison$col_summary_simple) + 6,
+                                nrow(comparison$col_summary_simple) + 5 +
                                   nrow(comparison$row_summary)),
-                     cols = 1:ncol(comparison$col_summary_simple),
+                     cols = 1:ncol(comparison$row_summary),
                      gridExpand = TRUE)
 
   # by column name summary tab

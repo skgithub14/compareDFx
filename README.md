@@ -77,6 +77,11 @@ ID for each row, then we can run the comparison.
 ``` r
 id_cols <- c("id1", "id2")
 comparison <- get_comparison(df1, df2, id_cols)
+#> Warning in get_comparison(df1, df2, id_cols): ID duplicates detected, recommend
+#> fixing these and re-running `get_comparison()`
+#> Warning in get_comparison(df1, df2, id_cols): ID columns contain `NA`,
+#> recommend fixing these and re-running `get_comparison()`
+#> df1 and df2 have different columns therefore no records are recorded as 'matched'
 ```
 
 The output of `get_comparison()` is a list with elements:
@@ -102,28 +107,28 @@ Summary statistics are provided by `$row_summary`,
 knitr::kable(comparison$row_summary)
 ```
 
-| Rows               | df1 | df2 |
-|:-------------------|----:|----:|
-| Total              |  10 |   8 |
-| Added              |   1 |  NA |
-| Deleted            |  NA |   1 |
-| Changed            |   5 |   5 |
-| Unchanged          |   0 |   0 |
-| Exact duplicate    |   2 |   3 |
-| ID only duplicates |   2 |   0 |
-| `NA` ID values     |   1 |   0 |
+| Rows               | df1 | df2 | Issues                                  | See                                                       |
+|:-------------------|----:|----:|:----------------------------------------|:----------------------------------------------------------|
+| Total              |  10 |   8 | NA                                      | all (for a comparison), or df1 and df2 (for the raw data) |
+| Added              |   1 |  NA | NA                                      | adds                                                      |
+| Deleted            |  NA |   1 | NA                                      | dels                                                      |
+| Changed            |   5 |   5 | NA                                      | changed (top/bottom view) or changed_lr (left/right view) |
+| Matched            |   0 |   0 | NA                                      | matched                                                   |
+| Exact duplicates   |   2 |   3 | NA                                      | exact_dups                                                |
+| ID only duplicates |   2 |   0 | Fix these records and re-run comparison | id_dups                                                   |
+| `NA` ID values     |   1 |   0 | Fix these records and re-run comparison | id_NA                                                     |
 
 ``` r
 knitr::kable(comparison$col_summary_simple)
 ```
 
-| Columns        | df1 | df2 |
-|:---------------|----:|----:|
-| Total          |  12 |  12 |
-| Added          |   1 |  NA |
-| Deleted        |  NA |   1 |
-| Changed        |   4 |   4 |
-| Mismatch class |   2 |   2 |
+| Columns        | df1 | df2 | Issues                                                                |
+|:---------------|----:|----:|:----------------------------------------------------------------------|
+| Total          |  12 |  12 | NA                                                                    |
+| Added          |   1 |  NA | df1 and df2 have different columns therefore no records are ‘matched’ |
+| Deleted        |  NA |   1 | df1 and df2 have different columns therefore no records are ‘matched’ |
+| Changed        |   4 |   4 | NA                                                                    |
+| Mismatch class |   2 |   2 | NA                                                                    |
 
 ``` r
 knitr::kable(comparison$col_summary_by_col)
@@ -229,8 +234,14 @@ create_comparison_excel(comparison,
 #> [1] 0
 ```
 
+![Screen shot from ‘summary’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png)
+
+![Screen shot from ‘summary by column’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
+
 ![Screen shot from ‘all’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report_screenshot.png)
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
 
 [Download
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)

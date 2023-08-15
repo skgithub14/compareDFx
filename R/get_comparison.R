@@ -41,21 +41,37 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
                              id_cols = id_cols,
                              tolerance = tolerance)
 
-  return(
-    segregate_compare(comparison_df = comp$comparison_df,
-                      comparison_table_diff = comp$comparison_table_diff,
-                      id_cols = id_cols,
-                      cc_out = cc_out,
-                      df1_exact_dups = dup_list1$exact_dups,
-                      df2_exact_dups = dup_list2$exact_dups,
-                      df1_id_dups = dup_list1$id_dups,
-                      df2_id_dups = dup_list2$id_dups,
-                      df1_id_NA = dup_list1$id_NA,
-                      df2_id_NA = dup_list2$id_NA,
-                      standard_col_list = standard_cols,
-                      df1 = df1,
-                      df2 = df2)
+  return_list <- segregate_compare(
+    comparison_df = comp$comparison_df,
+    comparison_table_diff = comp$comparison_table_diff,
+    id_cols = id_cols,
+    cc_out = cc_out,
+    df1_exact_dups = dup_list1$exact_dups,
+    df2_exact_dups = dup_list2$exact_dups,
+    df1_id_dups = dup_list1$id_dups,
+    df2_id_dups = dup_list2$id_dups,
+    df1_id_NA = dup_list1$id_NA,
+    df2_id_NA = dup_list2$id_NA,
+    standard_col_list = standard_cols,
+    df1 = df1,
+    df2 = df2
   )
+
+  # issue warnings and messages
+  if (nrow(return_list$id_dups) > 0) {
+    warning("ID duplicates detected, recommend fixing these and re-running `get_comparison()`")
+  }
+  if (nrow(return_list$id_NA) > 0) {
+    warning("ID columns contain `NA`, recommend fixing these and re-running `get_comparison()`")
+  }
+  if (nrow(return_list$adds) > 0 | nrow(return_list$dels) > 0) {
+    message("df1 and df2 have different columns therefore no records are recorded as 'matched'")
+  }
+  if (all(return_list$all$discrepancy == "matched")) {
+    message("df1 and df2 are identical")
+  }
+
+  return(return_list)
 }
 
 
@@ -815,11 +831,33 @@ summarize_compare_rows <- function(df1,
     "Added", nrow(adds), NA_real_,
     "Deleted", NA_real_, nrow(dels),
     "Changed", nrow(changed_lr), nrow(changed_lr),
-    "Unchanged", nrow(matched), nrow(matched),
-    "Exact duplicate", all_val_dup_cnt1, all_val_dup_cnt2,
+    "Matched", nrow(matched), nrow(matched),
+    "Exact duplicates", all_val_dup_cnt1, all_val_dup_cnt2,
     "ID only duplicates", id_dup_row_cnt1, id_dup_row_cnt2,
     "`NA` ID values", id_na_cnt1, id_na_cnt2
-  )
+  ) %>%
+
+    dplyr::mutate(
+      Issues = dplyr::case_when(
+        Rows == "ID only duplicates" & (`df1` > 0 | `df2`) > 0 ~ "Fix these records and re-run comparison",
+        Rows == "`NA` ID values" & (`df1` > 0 | `df2`) > 0 ~ "Fix these records and re-run comparison",
+        TRUE ~ NA_character_
+      ),
+
+
+      `See` = dplyr::recode(
+        Rows,
+        "Total" = "all (for a comparison), or df1 and df2 (for the raw data)",
+        "Added" = "adds",
+        "Deleted" = "dels",
+        "Changed" = "changed (top/bottom view) or changed_lr (left/right view)",
+        "Matched" = "matched",
+        "Exact duplicates" = "exact_dups",
+        "ID only duplicates" = "id_dups",
+        "`NA` ID values" = "id_NA",
+        .default = NA_character_
+      )
+    )
 
   return(summ_df)
 }
@@ -914,7 +952,17 @@ summarize_compare_cols <- function (df1,
     "Deleted"          , NA_real_               , length(cc_out$df2_only),
     "Changed"          , sum(col_chng_ind)      , sum(col_chng_ind)      ,
     "Mismatch class"   , col_class_diff_cnt     , col_class_diff_cnt
-  )
+  ) %>%
+
+    dplyr::mutate(
+      Issues = dplyr::case_when(
+        Columns == "Added" & `df1` > 0 ~
+          "df1 and df2 have different columns therefore no records are 'matched'",
+        Columns == "Deleted" & `df2` > 0 ~
+          "df1 and df2 have different columns therefore no records are 'matched'",
+        TRUE ~ NA_character_
+      )
+    )
 
   # a report by column name
   report_by_col <- tibble::tibble(

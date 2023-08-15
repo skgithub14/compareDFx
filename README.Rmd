@@ -129,8 +129,11 @@ create_comparison_excel(comparison,
                         autoOpen = TRUE)
 ```
 
+![Screen shot from 'summary' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png)
 
-![Screen shot from 'all' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report_screenshot.png)
+![Screen shot from 'summary by column' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
+
+![Screen shot from 'all' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
 
 [Download comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
