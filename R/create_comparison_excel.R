@@ -42,6 +42,9 @@ create_comparison_excel <- function (comparison,
                                          fontColour = "#9C0006",
                                          fgFill = "#FFC7CE",
                                          textDecoration = "bold")
+  falseConditionalFormatting <- openxlsx::createStyle(fontColour = "#9C0006",
+                                                      bgFill = "#FFC7CE",
+                                                      textDecoration = "bold")
 
   # summary tab, rows and simple column report
   summary_sname <- "summary"
@@ -94,6 +97,17 @@ create_comparison_excel <- function (comparison,
                      rows = 2:(nrow(comparison$col_summary_by_col) + 1),
                      cols = 1:ncol(comparison$col_summary_by_col),
                      gridExpand = TRUE)
+  openxlsx::conditionalFormatting(
+    wb,
+    sheet = summary_col_sname,
+    row = seq(2, 1 + nrow(comparison$col_summary_by_col)),
+    cols = which(colnames(comparison$col_summary_by_col) %in% c("In df1",
+                                                                "In df2",
+                                                                "Classes match")),
+    rule = "FALSE",
+    type = "contains",
+    style = falseConditionalFormatting
+  )
 
   # all other data frames
   y <- names(comparison) %>%
@@ -106,6 +120,8 @@ create_comparison_excel <- function (comparison,
               "id_cols",
               "cc_out")) %>%
     purrr::map(\(x) {
+
+      # set-up the worksheet and write the data
       openxlsx::addWorksheet(wb, sheetName = x)
       openxlsx::setColWidths(wb,
                              sheet = x,
@@ -116,6 +132,8 @@ create_comparison_excel <- function (comparison,
                           x = comparison[[x]],
                           headerStyle = headerStyle,
                           withFilter = TRUE)
+
+      # freeze panes
       freeCols <- colnames(comparison[[x]]) %>%
         setdiff(c("source",
                   comparison$id_cols,
@@ -125,10 +143,14 @@ create_comparison_excel <- function (comparison,
                   "exact dup cnt.df1",
                   "exact dup cnt.df2",
                   "ID dup cnt"))
-      openxlsx::freezePane(wb,
-                           sheet = x,
-                           firstActiveRow = 2,
-                           firstActiveCol = which(colnames(comparison[[x]]) == freeCols[1]))
+      openxlsx::freezePane(
+        wb,
+        sheet = x,
+        firstActiveRow = 2,
+        firstActiveCol = which(colnames(comparison[[x]]) == freeCols[1])
+      )
+
+      # add general styling
       openxlsx::addStyle(wb,
                          sheet = x,
                          style = generalStyle,
@@ -136,7 +158,8 @@ create_comparison_excel <- function (comparison,
                          cols = 1:ncol(comparison[[x]]),
                          gridExpand = TRUE)
 
-      # conditionally apply addition/deletion formatting based on the sheet
+
+      # conditionally apply addition/deletion formatting for row and value changes
       if (x == "adds") {
         openxlsx::addStyle(wb,
                            sheet = x,
@@ -160,36 +183,46 @@ create_comparison_excel <- function (comparison,
         if (x == "all") {
 
           # addition rows
-          openxlsx::addStyle(wb,
-                             sheet = x,
-                             style = additionStyle,
-                             rows = 1 + stringr::str_which(comparison[[x]]$discrepancy, "addition") ,
-                             cols = seq(which(colnames(comparison[[x]]) == freeCols[1]),
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = additionStyle,
+            rows = 1 + stringr::str_which(comparison[[x]]$discrepancy, "addition") ,
+            cols = seq(which(colnames(comparison[[x]]) == freeCols[1]),
                                         ncol(comparison[[x]])),
-                             gridExpand = TRUE)
+            gridExpand = TRUE
+          )
 
           # deletion rows
-          openxlsx::addStyle(wb,
-                             sheet = x,
-                             style = deletionStyle,
-                             rows = 1 + stringr::str_which(comparison[[x]]$discrepancy, "deletion") ,
-                             cols = seq(which(colnames(comparison[[x]]) == freeCols[1]),
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = deletionStyle,
+            rows = 1 + stringr::str_which(comparison[[x]]$discrepancy, "deletion") ,
+            cols = seq(which(colnames(comparison[[x]]) == freeCols[1]),
                                         ncol(comparison[[x]])),
-                             gridExpand = TRUE)
+            gridExpand = TRUE
+          )
         }
 
         # values in change rows
         if (x == "all") {
           index_lookup <- comparison$all_index_by_col
+
         } else if (x == "changed") {
           index_lookup <- comparison$change_index_by_col
+
         } else if (x == "changed_lr") {
           index_lookup <- comparison$change_index_by_col_lr
+
         } else {
           stop("x must be one of `c('all', 'changed', 'change_lr')`")
         }
+
         for (el in seq_along(index_lookup)) {
+
           if (all(is.na(index_lookup[[el]]))) { next }
+
           if (x %in% c("all", "changed")) {
             cols <- which(colnames(comparison[[x]]) == names(index_lookup)[el])
             df1_rows <- 1 + which(comparison[[x]]$source == "df1")
@@ -209,7 +242,9 @@ create_comparison_excel <- function (comparison,
                                rows = del_rows,
                                cols = cols,
                                gridExpand = TRUE)
+
           } else if (x == "changed_lr") {
+
             rows <- 1 + index_lookup[[el]]
             add_cols <- paste0(names(index_lookup)[el], ".df1")
             add_cols <- which(colnames(comparison[[x]]) == add_cols)
@@ -230,6 +265,72 @@ create_comparison_excel <- function (comparison,
           }
         } # end of for loop through index lookup
       } # end of if statement for all, changed, and changed_lr comparison elements
+
+
+      # conditionally color added/deleted whole columns
+      if (!x %in% c("df1", "df2")) {
+        if (x != "changed_lr") {
+
+          # cols added in df1
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = additionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% comparison$cc_out$df1_only),
+            gridExpand = TRUE
+          )
+
+          # cols in df2 but not in df1
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = deletionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% comparison$cc_out$df2_only),
+            gridExpand = TRUE
+          )
+
+          # for the changed left/right view
+        } else {
+
+          # cols added in df1
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = additionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% paste0(comparison$cc_out$df1_only, ".df1")),
+            gridExpand = TRUE
+          )
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = deletionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% paste0(comparison$cc_out$df1_only, ".df2")),
+            gridExpand = TRUE
+          )
+
+          # cols in df2 but not df1
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = deletionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% paste0(comparison$cc_out$df2_only, ".df2")),
+            gridExpand = TRUE
+          )
+          openxlsx::addStyle(
+            wb,
+            sheet = x,
+            style = additionStyle,
+            rows = 2:(nrow(comparison[[x]]) + 1),
+            cols = which(colnames(comparison[[x]]) %in% paste0(comparison$cc_out$df2_only, ".df1")),
+            gridExpand = TRUE
+          )
+        }
+      } # end of if statement to format added/deleted whole columns
     })
 
   # save the file

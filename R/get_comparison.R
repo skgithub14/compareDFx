@@ -224,10 +224,14 @@ segregate_compare <- function(comparison_df,
   # split into additions, deletions, and changes data sets
   adds <- all_dat2 %>%
     dplyr::filter(stringr::str_detect(discrepancy, "addition")) %>%
-    dplyr::select(-c(`change group`, `ID dup cnt`))
+    dplyr::select(-c(`change group`,
+                     `ID dup cnt`,
+                     tidyselect::all_of(cc_out$df2_only)))
   dels <- all_dat2 %>%
     dplyr::filter(stringr::str_detect(discrepancy, "deletion")) %>%
-    dplyr::select(-c(`change group`, `ID dup cnt`))
+    dplyr::select(-c(`change group`,
+                     `ID dup cnt`,
+                     tidyselect::all_of(cc_out$df1_only)))
   changed <- all_dat2 %>%
     dplyr::filter(stringr::str_detect(discrepancy, "changed")) %>%
     dplyr::select(-`ID dup cnt`)
@@ -895,10 +899,8 @@ summarize_compare_cols <- function (df1,
     unlist()
 
   # column class mismatches TRUE/FALSE
-  class_mismatch <- col_class1 != col_class2
-
-  # total column class mismatches
-  col_class_diff_cnt <- sum(class_mismatch, na.rm = T)
+  class_match <- col_class1 == col_class2
+  col_class_diff_cnt <- sum(!(class_match), na.rm = T)
 
   # check if a column name was in the original data
   in_df1 <- colnames(df_standard_cols$df1) %in% c(cc_out$both, cc_out$df1_only)
@@ -906,10 +908,12 @@ summarize_compare_cols <- function (df1,
 
   # report comparing new to old, high level
   report_simple <- tibble::tribble(
-    ~ Columns          , ~ "df1"             , ~ "df2"             ,
-    "Total"            , ncol(df1)         , ncol(df2)         ,
-    "Changed"          , sum(col_chng_ind) , sum(col_chng_ind) ,
-    "Mismatch class", col_class_diff_cnt, col_class_diff_cnt,
+    ~ Columns          , ~ "df1"                , ~ "df2"                ,
+    "Total"            , ncol(df1)              , ncol(df2)              ,
+    "Added"            , length(cc_out$df1_only), NA_real_               ,
+    "Deleted"          , NA_real_               , length(cc_out$df2_only),
+    "Changed"          , sum(col_chng_ind)      , sum(col_chng_ind)      ,
+    "Mismatch class"   , col_class_diff_cnt     , col_class_diff_cnt
   )
 
   # a report by column name
@@ -918,7 +922,7 @@ summarize_compare_cols <- function (df1,
     `In df1` = in_df1,
     `In df2` = in_df2,
     `Changes` = col_chng_cnts,
-    `Mismatched class` = class_mismatch,
+    `Classes match` = class_match,
     `df1 class` = col_class1,
     `df2 class` = col_class2
   )

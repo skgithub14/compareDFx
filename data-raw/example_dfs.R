@@ -74,9 +74,6 @@ df1 <- base %>%
     date = as.Date("2023-01-05")
   ) %>%
 
-  # # add a column not in df2
-  # dplyr::mutate(extra1 = rep(1, 6)) %>%
-
   # add columns with same names and values as df2 but with different classes
   dplyr::mutate(class_num_char = rep(100, 10)) %>%
   dplyr::mutate(class_num_log = rep(NA_real_, 10)) %>%
@@ -85,7 +82,11 @@ df1 <- base %>%
   dplyr::mutate(
     dec_diff_ref = rep(1, 10),
     dec_diff = rep(1, 10),
-  )
+  ) %>%
+
+  # add a column not in df2
+  dplyr::mutate(extra1 = "extra1")
+
 
 df2 <- base %>%
 
@@ -116,9 +117,6 @@ df2 <- base %>%
   dplyr::bind_rows(base[1, ]) %>%
   dplyr::arrange(id1, id2) %>%
 
-  # # add a column not in df1
-  # dplyr::mutate(extra2 = rep(2, 7))  %>%
-
   # add columns with same names and values as df1 but with different classes
   dplyr::mutate(class_num_char = rep("100", 8)) %>%
   dplyr::mutate(class_num_log = rep(NA, 8)) %>%
@@ -132,7 +130,10 @@ df2 <- base %>%
     id1 == 6 & id2 == "M",
     1,
     dec_diff
-  ))
+  )) %>%
+
+  # add a column not in df1
+  dplyr::mutate(extra2 = "extra2")
 
 usethis::use_data(df1, overwrite = TRUE)
 usethis::use_data(df2, overwrite = TRUE)

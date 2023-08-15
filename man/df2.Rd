@@ -7,7 +7,7 @@
 \format{
 \subsection{'df2'}{
 
-A data frame with 8 rows and 11 columns:
+A data frame with 8 rows and 12 columns:
 \describe{
 \item{id1}{ID column 1}
 \item{id2}{ID column 2}
@@ -20,6 +20,7 @@ A data frame with 8 rows and 11 columns:
 \item{class_num_log}{a logical column that corresponds to a numeric column in \code{df1}}
 \item{dec_diff_ref}{a numeric column used to calculate \code{dec_diff}}
 \item{dec_diff}{a numeric column for testing \code{tolerance} sensitivity}
+\item{extra2}{a column in \code{df2} which does not exist in \code{df1}}
 }
 }
 }

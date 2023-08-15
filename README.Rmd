@@ -111,7 +111,7 @@ The data frame shown above contains special columns that provide information on 
   
     - `"ID duplicate (not exact duplicate)"`: a row that had multiple occurrences of the same combination of `id_cols` in either `df1` or `df2` but for which there was not an exact duplicate (meaning at least one non-ID value in the row was different). An ID duplicate cannot be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"` because there will be multiple value matches when comparing `df1` and `df2`. The user should fix these errors and re-run the comparison.
   
-    - `"ID contains `NA`"`: a row in either `df1` or `df2` which had an `NA` value in one or more `id_cols`. The comparison procedure requires non-`NA` values for all `id_cols` therefore these rows will not be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`. The user should fix these errors and re-run the comparison.
+    - `"ID contains NA"`: a row in either `df1` or `df2` which had an `NA` value in one or more `id_cols`. The comparison procedure requires non-`NA` values for all `id_cols` therefore these rows will not be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`. The user should fix these errors and re-run the comparison.
   
 -  `change group`: if `discrepancy` contains `"changed"` this column will be populated with an arbitrary number that links changed records between `df1` and `df2`
 

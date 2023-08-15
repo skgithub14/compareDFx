@@ -3,7 +3,7 @@
 #' An example data frame for testing compareDFx
 #'
 #' @format ## 'df1'
-#' A data frame with 10 rows and 11 columns:
+#' A data frame with 10 rows and 12 columns:
 #' \describe{
 #'  \item{id1}{ID column 1}
 #'  \item{id2}{ID column 2}
@@ -16,6 +16,7 @@
 #'  \item{class_num_log}{a numeric column that corresponds to a logical column in `df2`}
 #'  \item{dec_diff_ref}{a numeric column used to calculate `dec_diff`}
 #'  \item{dec_diff}{a numeric column for testing `tolerance` sensitivity}
+#'  \item{extra1}{a column in `df1` which does not exist in `df2`}
 #' }
 "df1"
 
@@ -25,7 +26,7 @@
 #' An example data frame for testing compareDFx
 #'
 #' @format ## 'df2'
-#' A data frame with 8 rows and 11 columns:
+#' A data frame with 8 rows and 12 columns:
 #' \describe{
 #'  \item{id1}{ID column 1}
 #'  \item{id2}{ID column 2}
@@ -38,5 +39,6 @@
 #'  \item{class_num_log}{a logical column that corresponds to a numeric column in `df1`}
 #'  \item{dec_diff_ref}{a numeric column used to calculate `dec_diff`}
 #'  \item{dec_diff}{a numeric column for testing `tolerance` sensitivity}
+#'  \item{extra2}{a column in `df2` which does not exist in `df1`}
 #' }
 "df2"
