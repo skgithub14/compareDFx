@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# compareDFx
+# compareDFx <a href="https://skgithub14.github.io/compareDFx/"><img src="man/figures/logo.png" align="right" height="120" alt="compareDFx website" /></a>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/skgithub14/compareDFx/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/skgithub14/compareDFx/actions/workflows/R-CMD-check.yaml)
@@ -115,13 +115,14 @@ The data frame shown above contains special columns that provide information on 
 Finally, we can produce a multi-tab, color-coded MS Excel report of our comparison using `create_comparison_excel()`:
 
 ```{r}
-tmp_dir <- tempdir()
+dir <- system.file("extdata", package = "compareDFx")
 create_comparison_excel(comparison, 
-                        path = file.path(tmp_dir, "comparison_report.xlsx"))
+                        path = file.path(dir, "comparison_report.xlsx"))
 ```
 
-```{r}
-xfun::embed_file("comparison_report.xlsx")
+```{r, include=FALSE}
+xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
 ```
+
 
 
