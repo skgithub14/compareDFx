@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# compareDFx <a href="https://skgithub14.github.io/compareDFx/"><img src="man/figures/logo.png" align="right" height="120" alt="compareDFx website" /></a>
+# compareDFx <a href="https://skgithub14.github.io/compareDFx/"><img src="man/figures/logo.png" align="right" height="139" alt="compareDFx website" /></a>
 
 <!-- badges: start -->
 
@@ -25,6 +25,10 @@ You can install the development version of {compareDFx} like so:
 # install.package("devtools")
 install_github("skgithub14/compareDFx")
 ```
+
+<br>
+
+------------------------------------------------------------------------
 
 ## Comparing two data frames using {compareDFx}
 
