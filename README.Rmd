@@ -129,13 +129,7 @@ create_comparison_excel(comparison,
 ```
 
 
-Screen shot from 'all' tab of comparison_report.xlsx:
+![Screen shot from 'all' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report_screenshot.png)
 
-![Screen shot from 'all' tab of comparison_report.xlsx](inst/extdata/comparison_report_screenshot.png)
-
-See the full MS Excel file here (only clickable on when viewing on [https://skgithub14.github.io/compareDFx/](https://skgithub14.github.io/compareDFx/)):
-
-```{r, echo=FALSE}
-xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
-```
+[Download comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
