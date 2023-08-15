@@ -85,7 +85,16 @@
 </div>
 <!-- badges: start -->
 
-<p>{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The comparison analysis shows changes and errors by row and column and provides summary statistics. {compareDFx} can also compare data frames with different columns and column classes. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike.</p>
+<p>{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike and makes identifying data issues and version differences quick and easy.</p>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png" alt=""><p class="caption">Screen shot from ‘summary’ tab of comparison_report.xlsx</p>
+</div>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png" alt=""><p class="caption">Screen shot from ‘summary by column’ tab of comparison_report.xlsx</p>
+</div>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png" alt=""><p class="caption">Screen shot from ‘all’ tab of comparison_report.xlsx</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -1075,7 +1084,7 @@
 </ul>
 </li>
 <li><p><code>change group</code>: if <code>discrepancy</code> contains <code>"changed"</code> this column will be populated with an arbitrary number that links changed records between <code>df1</code> and <code>df2</code></p></li>
-<li><p><code>exact dup cnt</code>: if <code>discrepancy</code> contains <code>"exact duplicate"</code> this column give the number of exact duplicates in <code>df1</code> or <code>df2</code></p></li>
+<li><p><code>exact dup cnt</code>: if <code>discrepancy</code> contains <code>"exact duplicate"</code> this column gives the number of exact duplicates in <code>df1</code> or <code>df2</code></p></li>
 <li><p><code>ID dup cnt</code>: if <code>discrepancy</code> contains <code>"ID duplicate (not exact duplicate)"</code> this column gives the number of ID duplicates in <code>df1</code> or <code>df2</code></p></li>
 </ul>
 <p>Finally, we can produce a multi-tab, color-coded MS Excel report of our comparison using <code><a href="reference/create_comparison_excel.html">create_comparison_excel()</a></code>:</p>
@@ -1085,15 +1094,7 @@
 <span>                        path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"comparison_report.xlsx"</span><span class="op">)</span>,</span>
 <span>                        autoOpen <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png" alt=""><p class="caption">Screen shot from ‘summary’ tab of comparison_report.xlsx</p>
-</div>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png" alt=""><p class="caption">Screen shot from ‘summary by column’ tab of comparison_report.xlsx</p>
-</div>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png" alt=""><p class="caption">Screen shot from ‘all’ tab of comparison_report.xlsx</p>
-</div>
+<p>See the screenshots at the top of this page for an idea of what the Excel report looks like, or you can download the file:</p>
 <p><a href="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx" class="external-link">Download comparison_report.xlsx</a></p>
 </div>
 </div>
