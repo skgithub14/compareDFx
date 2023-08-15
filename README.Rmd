@@ -20,62 +20,108 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/skgithub14/compareDFx/branch/master/graph/badge.svg)](https://app.codecov.io/gh/skgithub14/compareDFx?branch=master)
 <!-- badges: end -->
 
-The goal of compareDFx is to compare two different versions of the same data frame using a deatiled MS Excel report.
+{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The comparison analysis shows changes and errors by row and column and provides summary statistics. {compareDFx} can also compare data frames with different columns and column classes. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike.
 
 ## Installation
 
-You can install the development version of compareDFx like so:
+You can install the development version of {compareDFx} like so:
 
 ``` r
 # install.package("devtools")
 install_github("skgithub14/compareDFx")
 ```
 
-## Example
+## Comparing two data frames using {compareDFx} 
 
-This is a basic example which shows you how to solve a common problem:
+Using the two example data frames included with the package, `df1` and `df2`, we will walk through the {compareDFx} workflow.
 
 ```{r example}
 library(compareDFx)
 
-# view the raw data
-compareDFx::df1
-compareDFx::df2
+# example data, df1 
+knitr::kable(compareDFx::df1)
+```
+
+```{r}
+# example data, df2
+knitr::kable(compareDFx::df2)
 ```
 
 
+Next, we need to identify the columns which collectively make a unique ID for each row, then we can run the comparison.
+
 ```{r}
-# columns that collectively make a unique ID for each row in df1 or df2
 id_cols <- c("id1", "id2")
-```
-
-
-```{r}
 comparison <- get_comparison(df1, df2, id_cols)
 ```
 
+The output of `get_comparison()` is a list with elements:
+
 ```{r}
-comparison$row_summary
+names(comparison)
+```
+
+See the `get_comparison()` documentation for details on each list element. Below we will view the most important ones.
+
+Summary statistics are provided by `$row_summary`, `$col_summary_simple`, and `$col_summary_by_col`.
+
+```{r}
+knitr::kable(comparison$row_summary)
 ```
 
 
 ```{r}
-comparison$col_summary_simple
+knitr::kable(comparison$col_summary_simple)
 ```
 
 
 ```{r}
-comparison$col_summary_by_col
+knitr::kable(comparison$col_summary_by_col)
 ```
 
+`$all` shows all of the compared data from `df1` and `df2`. 
 
 ```{r}
-comparison$all
+knitr::kable(comparison$all)
 ```
 
+The data frame shown above contains special columns that provide information on the comparison for each record:
+
+-  `source`: whether the data in the row came from `df1` or `df2`
+
+-  `discrepancy`: the comparison status, which can take one or more of the following values:
+
+    - `"matched"`: a row that exactly matched between `df1` and `df2` (for `matched` rows, only the `df1` copy is shown)
+  
+    - `"addition"`: a row that only existed in `df1`
+  
+    - `"deletion"`: a row that only existed in `df2`
+  
+    - `"changed"`: a row where the `id_cols` matched between between `df1` and `df2` but which had a least one other column with a change
+  
+    - `"exact duplicate"`: a row with multiple occurrences in either `df1` or `df2`. "Exact" means that every value in the row matched perfectly to its duplicate copies. Exact duplicates can also be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`.
+  
+    - `"ID duplicate (not exact duplicate)"`: a row that had multiple occurrences of the same combination of `id_cols` in either `df1` or `df2` but for which there was not an exact duplicate (meaning at least one non-ID value in the row was different). An ID duplicate cannot be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"` because there will be multiple value matches when comparing `df1` and `df2`. The user should fix these errors and re-run the comparison.
+  
+    - `"ID contains `NA`"`: a row in either `df1` or `df2` which had an `NA` value in one or more `id_cols`. The comparison procedure requires non-`NA` values for all `id_cols` therefore these rows will not be marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`. The user should fix these errors and re-run the comparison.
+  
+-  `change group`: if `discrepancy` contains `"changed"` this column will be populated with an arbitrary number that links changed records between `df1` and `df2`
+
+-  `exact dup cnt`: if `discrepancy` contains `"exact duplicate"` this column give the number of exact duplicates in `df1` or `df2`
+
+-  `ID dup cnt`: if `discrepancy` contains `"ID duplicate (not exact duplicate)"` this column gives the number of ID duplicates in `df1` or `df2`
+
+
+Finally, we can produce a multi-tab, color-coded MS Excel report of our comparison using `create_comparison_excel()`:
 
 ```{r}
 tmp_dir <- tempdir()
-create_comparison_excel(comparison, path = file.path(tmp_dir, "comparison_report.xlsx"))
+create_comparison_excel(comparison, 
+                        path = file.path(tmp_dir, "comparison_report.xlsx"))
 ```
+
+```{r}
+xfun::embed_file("comparison_report.xlsx")
+```
+
 

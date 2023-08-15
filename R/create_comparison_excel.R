@@ -103,7 +103,8 @@ create_comparison_excel <- function (comparison,
               "all_index_by_col",
               "change_index_by_col",
               "change_index_by_col_lr",
-              "id_cols")) %>%
+              "id_cols",
+              "cc_out")) %>%
     purrr::map(\(x) {
       openxlsx::addWorksheet(wb, sheetName = x)
       openxlsx::setColWidths(wb,

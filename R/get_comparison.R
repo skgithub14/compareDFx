@@ -1,277 +1,63 @@
-#' Compare column names of two data frames to find differences
+#' Compare two data frames
 #'
-#' Indicates if two data frames have the same column names or not and what the
-#' differences are.
+#' Generates a detailed comparison report of two data frames
 #'
 #' @param df1,df2 data frames to compare
+#' @param id_cols the column names in `df1` and `df2` that make up a unique ID
+#' @param tolerance the amount by which two numbers can differ to be considered
+#'  equal, default is `0.00001`
 #'
-#' @returns a named list with 4 elements:
-#'  * `same`: a logical indicating whether `df1` and `df2` have the same columns
-#'  * `both`: a character vector with the column names in both `df1` and `df2`
-#'  * `df1_only`: a character vector with the column names only in `df1`
-#'  * `df2_only`: a character vector with the column names only in `df2`
+#' @inherit segregate_compare return
 #'
 #' @export
 #'
-compare_cols <- function(df1, df2) {
-  both <- intersect(colnames(df1), colnames(df2))
-  df1_only <- setdiff(colnames(df1), colnames(df2))
-  df2_only <- setdiff(colnames(df2), colnames(df1))
+get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
 
-  if (length(df1_only) == 0 & length(df2_only) == 0) {
-    same <- TRUE
-  } else {
-    same <- FALSE
-  }
+  # compare the column names
+  cc_out <- compare_cols(df1 = df1, df2 = df2)
+
+  # if there were different columns, add dummy columns as needed
+  df_list <- insert_dummy_cols(df1 = df1,
+                               df2 = df2,
+                               cc_out = cc_out,
+                               id_cols = id_cols)
+
+  # standardize the order of the columns
+  standard_cols <- standardize_col_order(df1 = df_list$df1,
+                                         df2 = df_list$df2,
+                                         id_cols = id_cols)
+
+  # separate out exact duplicates, ID only duplicates, and IDs with NA
+  dup_list1 <- find_dups(df = standard_cols$df1,
+                         id_cols = id_cols,
+                         source = "df1")
+  dup_list2 <- find_dups(df = standard_cols$df2,
+                         id_cols = id_cols,
+                         source = "df2")
+
+  # compare data frames on de-duplicated data
+  comp <- compare_df_wrapper(df1_no_dups = dup_list1$no_dups,
+                             df2_no_dups = dup_list2$no_dups,
+                             id_cols = id_cols,
+                             tolerance = tolerance)
 
   return(
-    list(
-      same = same,
-      both = both,
-      df1_only = df1_only,
-      df2_only = df2_only
-    )
+    segregate_compare(comparison_df = comp$comparison_df,
+                      comparison_table_diff = comp$comparison_table_diff,
+                      id_cols = id_cols,
+                      cc_out = cc_out,
+                      df1_exact_dups = dup_list1$exact_dups,
+                      df2_exact_dups = dup_list2$exact_dups,
+                      df1_id_dups = dup_list1$id_dups,
+                      df2_id_dups = dup_list2$id_dups,
+                      df1_id_NA = dup_list1$id_NA,
+                      df2_id_NA = dup_list2$id_NA,
+                      standard_col_list = standard_cols,
+                      df1 = df1,
+                      df2 = df2)
   )
 }
 
-
-#' Force two data frames to have the same columns by creating dummy columns
-#'
-#' For each column in data frame 1 that is missing in data frame 2, this
-#' function creates the missing column in data frame 2 and fills it with `NA`,
-#' and vice-version. It also makes the classes dummy columns match and ensure
-#' both data frames have the same column order.
-#'
-#' @inheritParams compare_cols
-#' @param cc_out a list output from [compare_cols()]
-#' @param id_cols a character vector of id columns output from [compare_cols()]
-#'
-#' @returns a named list with two elements:
-#'  * `df1`: the modified `df1` data frame
-#'  * `df2`: the modified `df2` data frame
-#'
-#' @export
-#'
-insert_dummy_cols <- function(df1, df2, cc_out, id_cols) {
-  # do nothing if they already have the same columns
-  if (cc_out$same) {
-    return(
-      list(
-        df1 = df1,
-        df2 = df2
-      )
-    )
-  }
-
-  # create missing columns with correct classes via utility function
-  make_cols <- function(ref_df, work_df, make_cols) {
-    if (length(make_cols) > 0) {
-      for (col in make_cols) {
-        ref_class <- class(ref_df[[col]])
-        if (ref_class == "numeric") {
-          work_df[[col]] <- NA_real_
-        } else if (ref_class == "integer") {
-          work_df[[col]] <- NA_integer_
-        } else {
-          work_df[[col]] <- NA_character_
-        }
-      }
-    }
-    return(work_df)
-  }
-
-  df1 <- make_cols(ref_df = df2, work_df = df1, make_cols = cc_out$df2_only)
-  df2 <- make_cols(ref_df = df1, work_df = df2, make_cols = cc_out$df1_only)
-
-  return(
-    list(
-      df1 = df1,
-      df2 = df2
-    )
-  )
-}
-
-
-#' Standardize column order
-#'
-#' Puts the columns of two data frames in the same order and places the unique
-#' identifiers columns to the far left of the data frame. Data frames must have
-#' the exact same columns (if not, apply [insert_dummy_cols()] first)
-#'
-#' @inheritParams compare_cols
-#' @inheritParams insert_dummy_cols
-#'
-#' @returns a list with two elements:
-#'  * `df1`: a modified data frame `df1`
-#'  * `df2`: a modified data frame `df2`
-#'
-#' @export
-#'
-standardize_col_order <- function(df1, df2, id_cols) {
-  not_id_cols <- setdiff(colnames(df1), id_cols)
-
-  df1 <- dplyr::select(
-    df1,
-    tidyselect::all_of(id_cols),
-    tidyselect::all_of(not_id_cols)
-  )
-
-  df2 <- dplyr::select(df2, tidyselect::all_of(colnames(df1)))
-
-  return(
-    list(
-      df1 = df1,
-      df2 = df2
-    )
-  )
-}
-
-#' Separate duplicated data frame rows from rows with no duplicates
-#'
-#' Separates a data frame into sub-data frames based on types of row duplication
-#' or lack thereof. Also identifies `NA` values in `id_cols`.
-#'
-#' @param df a data frame with or without duplicated rows
-#' @param id_cols a character vector of the column names that form a unique ID
-#' @param source a string, name of the data source (usually `"df1"` or `"df2"`)
-#'
-#' @returns a names list with four elements:
-#'  * `exact_dups`: rows which were duplicated for every value, there will be
-#'   one distinct row in `exact_dups` for each case and the column `n` will
-#'   list how many occurences of the row were in `df`.
-#'  * `id_dups`: rows which were duplicated based on `id_cols` but had other
-#'   values that differed, the column `n` contains how many ID duplicates of
-#'   one ID exist in `df`
-#'  * `id_NA`: rows which had an `NA` value in a `id_cols` column
-#'  * `no_dups`: this is `df` with all `id_dups` row removed and only one copy
-#'   of each `exact_dups` row.
-#'
-#' @export
-find_dups <- function(df, id_cols, source) {
-
-  # check for id columns with NA values
-  id_NA <- df %>%
-    dplyr::filter(dplyr::if_any(
-      .cols = tidyselect::all_of(id_cols),
-      ~ is.na(.)
-    )) %>%
-    dplyr::mutate(`ID dup cnt` = NA_real_,
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(`exact dup cnt` = NA_real_,
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(discrepancy = "ID contains `NA`",
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(source = source, .before = id_cols[1])
-
-  # duplicates that match on every column
-  exact_dups <- df %>%
-    dplyr::anti_join(dplyr::select(id_NA, -discrepancy)) %>%
-    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
-    dplyr::mutate(`exact dup cnt` = dplyr::row_number(),
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(`exact dup cnt` > 1) %>%
-    dplyr::slice_max(`exact dup cnt`) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(`ID dup cnt` = NA_real_,
-                  .after = `exact dup cnt`) %>%
-    dplyr::mutate(discrepancy = "exact duplicate",
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(source = source, .before = id_cols[1])
-
-  # duplicates that match only by the ID columns but have other differences
-  id_dups <- df %>%
-    dplyr::anti_join(dplyr::select(id_NA, -discrepancy)) %>%
-    dplyr::anti_join(dplyr::select(exact_dups,
-                                   -c(discrepancy, `exact dup cnt`))
-    ) %>%
-    dplyr::group_by(dplyr::across(tidyselect::all_of(id_cols))) %>%
-    dplyr::mutate(`ID dup cnt` = dplyr::row_number(),
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::filter(max(`ID dup cnt`, na.rm = T) > 1) %>%
-    dplyr::mutate(`ID dup cnt` = max(`ID dup cnt`, na.rm = T)) %>%
-    dplyr::ungroup()  %>%
-    dplyr::mutate(`exact dup cnt` = NA_real_,
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(discrepancy = "ID duplicate (not exact duplicate)",
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(source = source, .before = id_cols[1])
-
-  # data frame with duplicates removed:
-  #  * ID duplicates are removed because they will have multiple matches
-  #  * ID NAs are removed because they may not match correctly
-  #  * Exact match duplicates are reduced to one instance
-  #  * ids with NA values are retained
-  no_dups <- df %>%
-    dplyr::anti_join(dplyr::select(id_NA, -discrepancy)) %>%
-    dplyr::anti_join(dplyr::select(id_dups, -c(discrepancy, `ID dup cnt`)),
-                     by = id_cols) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(`ID dup cnt` = NA_real_,
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(discrepancy = NA_character_,
-                  .after = id_cols[length(id_cols)]) %>%
-    dplyr::mutate(source = source, .before = id_cols[1])
-
-  return(
-    list(
-      exact_dups = exact_dups,
-      id_dups = id_dups,
-      id_NA = id_NA,
-      no_dups = no_dups
-    )
-  )
-}
-
-
-#' Compare two data frames using [compareDF::compare_df()]
-#'
-#' A convenience wrapper for [compareDF::compare_df()]
-#'
-#' Rows that were duplicated in `df1` or `df2` should be removed prior to calling
-#' this function
-#'
-#' @param df1_no_dups,df2_no_dups a `no_dups` list element from a [find_dups()]
-#' output, for `df1` and `df2`, respectively
-#' @inheritParams insert_dummy_cols
-#' @param tolerance amount by which numeric values can vary and still be
-#'  considered equal (helps reduce machine rounding errors false positive
-#'  differences)
-#'
-#' @returns a list returned by [compareDF::compare_df()]
-#'
-#' @export
-compare_df_wrapper <- function(df1_no_dups,
-                               df2_no_dups,
-                               id_cols,
-                               tolerance) {
-
-  # make round_output_to match the tolerance
-  if (tolerance > 1) {
-    rnd <- 1
-  } else {
-    tol_chr <- as.character(tolerance)
-    tol_chr <- stringr::str_replace(tol_chr, "^\\.", "0.")
-    rnd <- nchar(tol_chr) - 2
-  }
-
-  comp <- compareDF::compare_df(
-    df1_no_dups,
-    df2_no_dups,
-    group_col = id_cols,
-    exclude = c("source", "discrepancy", "ID dup cnt", "exact dup cnt"),
-    tolerance_type = "difference",
-    tolerance = tolerance,
-    stop_on_error = FALSE,
-    keep_unchanged_rows = TRUE,
-    round_output_to = rnd
-  )
-
-  # transfer group numbers to comparison_table_diff for future cals
-  comp$comparison_table_diff$grp <- comp$comparison_df$grp
-
-  return(comp)
-}
 
 #' Segregates data frame comparisons by type
 #'
@@ -320,6 +106,8 @@ compare_df_wrapper <- function(df1_no_dups,
 #'  * `df1`: the original `df1` data frame
 #'  * `df2`: the original `df2` data frame
 #'  * `id_cols`: a vector of column names that collectively make a unique row ID
+#'  * `cc_out`: a list output from [compare_cols()] that details which columns
+#'   `df1` and `df2` have in common and the columns they do not have in common
 #'
 #' @export
 #'
@@ -597,7 +385,7 @@ segregate_compare <- function(comparison_df,
                                   !is.na(.),
                                   as.character(grp),
                                   .
-                                  ))
+                                ))
     )
 
   # get change indices for the all, top/bottom and left/right change views in
@@ -655,10 +443,303 @@ segregate_compare <- function(comparison_df,
       id_NA = id_NA,
       df1 = df1,
       df2 = df2,
-      id_cols = id_cols
+      id_cols = id_cols,
+      cc_out = cc_out
     )
   )
 }
+
+
+#' Compare column names of two data frames to find differences
+#'
+#' Indicates if two data frames have the same column names or not and what the
+#' differences are.
+#'
+#' @param df1,df2 data frames to compare
+#'
+#' @returns a named list with 4 elements:
+#'  * `same`: a logical indicating whether `df1` and `df2` have the same columns
+#'  * `both`: a character vector with the column names in both `df1` and `df2`
+#'  * `df1_only`: a character vector with the column names only in `df1`
+#'  * `df2_only`: a character vector with the column names only in `df2`
+#'
+#' @export
+#'
+compare_cols <- function(df1, df2) {
+  both <- intersect(colnames(df1), colnames(df2))
+  df1_only <- setdiff(colnames(df1), colnames(df2))
+  df2_only <- setdiff(colnames(df2), colnames(df1))
+
+  if (length(df1_only) == 0 & length(df2_only) == 0) {
+    same <- TRUE
+  } else {
+    same <- FALSE
+  }
+
+  return(
+    list(
+      same = same,
+      both = both,
+      df1_only = df1_only,
+      df2_only = df2_only
+    )
+  )
+}
+
+
+#' Force two data frames to have the same columns by creating dummy columns
+#'
+#' For each column in data frame 1 that is missing in data frame 2, this
+#' function creates the missing column in data frame 2 and fills it with `NA`,
+#' and vice-version. It also makes the classes dummy columns match and ensure
+#' both data frames have the same column order.
+#'
+#' @inheritParams compare_cols
+#' @param cc_out a list output from [compare_cols()]
+#' @param id_cols a character vector of id columns output from [compare_cols()]
+#'
+#' @returns a named list with two elements:
+#'  * `df1`: the modified `df1` data frame
+#'  * `df2`: the modified `df2` data frame
+#'
+#' @export
+#'
+insert_dummy_cols <- function(df1, df2, cc_out, id_cols) {
+  # do nothing if they already have the same columns
+  if (cc_out$same) {
+    return(
+      list(
+        df1 = df1,
+        df2 = df2
+      )
+    )
+  }
+
+  # create missing columns with correct classes via utility function
+  make_cols <- function(ref_df, work_df, make_cols) {
+    if (length(make_cols) > 0) {
+      for (col in make_cols) {
+        ref_class <- class(ref_df[[col]])
+        if (ref_class == "numeric") {
+          work_df[[col]] <- NA_real_
+        } else if (ref_class == "integer") {
+          work_df[[col]] <- NA_integer_
+        } else {
+          work_df[[col]] <- NA_character_
+        }
+      }
+    }
+    return(work_df)
+  }
+
+  df1 <- make_cols(ref_df = df2, work_df = df1, make_cols = cc_out$df2_only)
+  df2 <- make_cols(ref_df = df1, work_df = df2, make_cols = cc_out$df1_only)
+
+  return(
+    list(
+      df1 = df1,
+      df2 = df2
+    )
+  )
+}
+
+
+#' Standardize column order
+#'
+#' Puts the columns of two data frames in the same order and places the unique
+#' identifiers columns to the far left of the data frame. Data frames must have
+#' the exact same columns (if not, apply [insert_dummy_cols()] first)
+#'
+#' @inheritParams compare_cols
+#' @inheritParams insert_dummy_cols
+#'
+#' @returns a list with two elements:
+#'  * `df1`: a modified data frame `df1`
+#'  * `df2`: a modified data frame `df2`
+#'
+#' @export
+#'
+standardize_col_order <- function(df1, df2, id_cols) {
+  not_id_cols <- setdiff(colnames(df1), id_cols)
+
+  df1 <- dplyr::select(
+    df1,
+    tidyselect::all_of(id_cols),
+    tidyselect::all_of(not_id_cols)
+  )
+
+  df2 <- dplyr::select(df2, tidyselect::all_of(colnames(df1)))
+
+  return(
+    list(
+      df1 = df1,
+      df2 = df2
+    )
+  )
+}
+
+#' Separate duplicated data frame rows from rows with no duplicates
+#'
+#' Separates a data frame into sub-data frames based on types of row duplication
+#' or lack thereof. Also identifies `NA` values in `id_cols`.
+#'
+#' @param df a data frame with or without duplicated rows
+#' @param id_cols a character vector of the column names that form a unique ID
+#' @param source a string, name of the data source (usually `"df1"` or `"df2"`)
+#'
+#' @returns a names list with four elements:
+#'  * `exact_dups`: rows which were duplicated for every value, there will be
+#'   one distinct row in `exact_dups` for each case and the column `n` will
+#'   list how many occurences of the row were in `df`.
+#'  * `id_dups`: rows which were duplicated based on `id_cols` but had other
+#'   values that differed, the column `n` contains how many ID duplicates of
+#'   one ID exist in `df`
+#'  * `id_NA`: rows which had an `NA` value in a `id_cols` column
+#'  * `no_dups`: this is `df` with all `id_dups` row removed and only one copy
+#'   of each `exact_dups` row.
+#'
+#' @export
+find_dups <- function(df, id_cols, source) {
+
+  # check for id columns with NA values
+  id_NA <- df %>%
+    dplyr::filter(dplyr::if_any(
+      .cols = tidyselect::all_of(id_cols),
+      ~ is.na(.)
+    )) %>%
+    dplyr::mutate(`ID dup cnt` = NA_real_,
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(`exact dup cnt` = NA_real_,
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(discrepancy = "ID contains `NA`",
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(source = source, .before = id_cols[1])
+
+  # duplicates that match on every column
+  exact_dups <- df %>%
+    dplyr::anti_join(dplyr::select(id_NA, -discrepancy),
+                     by = intersect(colnames(df),
+                                    setdiff(colnames(id_NA), "discrepancy"))
+    ) %>%
+    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+    dplyr::mutate(`exact dup cnt` = dplyr::row_number(),
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(`exact dup cnt` > 1) %>%
+    dplyr::slice_max(`exact dup cnt`) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(`ID dup cnt` = NA_real_,
+                  .after = `exact dup cnt`) %>%
+    dplyr::mutate(discrepancy = "exact duplicate",
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(source = source, .before = id_cols[1])
+
+  # duplicates that match only by the ID columns but have other differences
+  id_dups <- df %>%
+    dplyr::anti_join(dplyr::select(id_NA, -discrepancy),
+                     by = intersect(colnames(df),
+                                    setdiff(colnames(id_NA), "discrepancy"))
+    ) %>%
+    dplyr::anti_join(dplyr::select(exact_dups, -c(discrepancy, `exact dup cnt`)),
+                     by = intersect(colnames(df),
+                                    setdiff(colnames(df), c("discrepancy",
+                                                            "exact dup cnt")))
+    ) %>%
+    dplyr::group_by(dplyr::across(tidyselect::all_of(id_cols))) %>%
+    dplyr::mutate(`ID dup cnt` = dplyr::n(),
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::filter(`ID dup cnt` > 1) %>%
+    dplyr::ungroup()  %>%
+    dplyr::mutate(`exact dup cnt` = NA_real_,
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(discrepancy = "ID duplicate (not exact duplicate)",
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(source = source, .before = id_cols[1])
+
+  # data frame with duplicates removed:
+  #  * ID duplicates are removed because they will have multiple matches
+  #  * ID NAs are removed because they may not match correctly
+  #  * Exact match duplicates are reduced to one instance
+  #  * ids with NA values are retained
+  no_dups <- df %>%
+    dplyr::anti_join(dplyr::select(id_NA, -discrepancy),
+                     by = intersect(colnames(df),
+                                    setdiff(colnames(id_NA), "discrepancy"))
+    ) %>%
+    dplyr::anti_join(dplyr::select(id_dups, -c(discrepancy, `ID dup cnt`)),
+                     by = id_cols) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(`ID dup cnt` = NA_real_,
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(discrepancy = NA_character_,
+                  .after = id_cols[length(id_cols)]) %>%
+    dplyr::mutate(source = source, .before = id_cols[1])
+
+  return(
+    list(
+      exact_dups = exact_dups,
+      id_dups = id_dups,
+      id_NA = id_NA,
+      no_dups = no_dups
+    )
+  )
+}
+
+
+#' Compare two data frames using [compareDF::compare_df()]
+#'
+#' A convenience wrapper for [compareDF::compare_df()]
+#'
+#' Rows that were duplicated in `df1` or `df2` should be removed prior to calling
+#' this function
+#'
+#' @param df1_no_dups,df2_no_dups a `no_dups` list element from a [find_dups()]
+#' output, for `df1` and `df2`, respectively
+#' @inheritParams insert_dummy_cols
+#' @param tolerance amount by which numeric values can vary and still be
+#'  considered equal (helps reduce machine rounding errors false positive
+#'  differences)
+#'
+#' @returns a list returned by [compareDF::compare_df()]
+#'
+#' @export
+compare_df_wrapper <- function(df1_no_dups,
+                               df2_no_dups,
+                               id_cols,
+                               tolerance) {
+
+  # make round_output_to match the tolerance
+  if (tolerance > 1) {
+    rnd <- 1
+  } else {
+    tol_chr <- as.character(tolerance)
+    tol_chr <- stringr::str_replace(tol_chr, "^\\.", "0.")
+    rnd <- nchar(tol_chr) - 2
+  }
+
+  suppressWarnings(
+    suppressMessages(
+      comp <- compareDF::compare_df(
+        df1_no_dups,
+        df2_no_dups,
+        group_col = id_cols,
+        exclude = c("source", "discrepancy", "ID dup cnt", "exact dup cnt"),
+        tolerance_type = "difference",
+        tolerance = tolerance,
+        stop_on_error = FALSE,
+        keep_unchanged_rows = TRUE,
+        round_output_to = rnd
+      )
+    )
+  )
+
+  # transfer group numbers to comparison_table_diff for future cals
+  comp$comparison_table_diff$grp <- comp$comparison_df$grp
+
+  return(comp)
+}
+
+
 
 
 #' Summary metrics for data frame comparison by rows
@@ -851,62 +932,3 @@ summarize_compare_cols <- function (df1,
 }
 
 
-#' Compare two data frames
-#'
-#' Generates a detailed comparison report of two data frames
-#'
-#' @param df1,df2 data frames to compare
-#' @param id_cols the column names in `df1` and `df2` that make up a unique ID
-#' @param tolerance the amount by which two numbers can differ to be considered
-#'  equal, default is `0.00001`
-#'
-#' @inherit segregate_compare return
-#'
-#' @export
-#'
-get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
-
-  # compare the column names
-  cc_out <- compare_cols(df1 = df1, df2 = df2)
-
-  # if there were different columns, add dummy columns as needed
-  df_list <- insert_dummy_cols(df1 = df1,
-                               df2 = df2,
-                               cc_out = cc_out,
-                               id_cols = id_cols)
-
-  # standardize the order of the columns
-  standard_cols <- standardize_col_order(df1 = df_list$df1,
-                                         df2 = df_list$df2,
-                                         id_cols = id_cols)
-
-  # separate out exact duplicates, ID only duplicates, and IDs with NA
-  dup_list1 <- find_dups(df = standard_cols$df1,
-                         id_cols = id_cols,
-                         source = "df1")
-  dup_list2 <- find_dups(df = standard_cols$df2,
-                         id_cols = id_cols,
-                         source = "df2")
-
-  # compare data frames on de-duplicated data
-  comp <- compare_df_wrapper(df1_no_dups = dup_list1$no_dups,
-                             df2_no_dups = dup_list2$no_dups,
-                             id_cols = id_cols,
-                             tolerance = tolerance)
-
-  return(
-    segregate_compare(comparison_df = comp$comparison_df,
-                      comparison_table_diff = comp$comparison_table_diff,
-                      id_cols = id_cols,
-                      cc_out = cc_out,
-                      df1_exact_dups = dup_list1$exact_dups,
-                      df2_exact_dups = dup_list2$exact_dups,
-                      df1_id_dups = dup_list1$id_dups,
-                      df2_id_dups = dup_list2$id_dups,
-                      df1_id_NA = dup_list1$id_NA,
-                      df2_id_NA = dup_list2$id_NA,
-                      standard_col_list = standard_cols,
-                      df1 = df1,
-                      df2 = df2)
-  )
-}
