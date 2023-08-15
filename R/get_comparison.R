@@ -877,11 +877,11 @@ summarize_compare_cols <- function (df1,
   # column classes df1
   col_class1 <- colnames(df_standard_cols$df1) %>%
     stats::setNames(colnames(df_standard_cols$df1)) %>%
-    purrr::imap(\(x, idx) {
-      if (idx %in% cc_out$df2_only) {
+    purrr::imap(~ {
+      if (.y %in% cc_out$df2_only) {
         NA_character_
       } else {
-        class(df1[[x]])
+        class(df1[[.x]])
       }
     }) %>%
     unlist()
@@ -889,11 +889,11 @@ summarize_compare_cols <- function (df1,
   # column classes df2
   col_class2 <- colnames(df_standard_cols$df2) %>%
     stats::setNames(colnames(df_standard_cols$df2)) %>%
-    purrr::imap(\(x, idx) {
-      if (idx %in% cc_out$df1_only) {
+    purrr::imap(~ {
+      if (.y %in% cc_out$df1_only) {
         NA_character_
       } else {
-        class(df2[[x]])
+        class(df2[[.x]])
       }
     }) %>%
     unlist()
