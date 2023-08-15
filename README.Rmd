@@ -132,4 +132,9 @@ xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
 ```
 
 
+MANUAL LINK
+
+[comparison_report.xlsx](inst/extdata/comparison_report.xlsx)
+
+
 
