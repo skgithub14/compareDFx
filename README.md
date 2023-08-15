@@ -217,7 +217,7 @@ information on the comparison for each record:
   between `df1` and `df2`
 
 - `exact dup cnt`: if `discrepancy` contains `"exact duplicate"` this
-  column give the number of exact duplicates in `df1` or `df2`
+  column gives the number of exact duplicates in `df1` or `df2`
 
 - `ID dup cnt`: if `discrepancy` contains
   `"ID duplicate (not exact duplicate)"` this column gives the number of

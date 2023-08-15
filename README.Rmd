@@ -115,7 +115,7 @@ The data frame shown above contains special columns that provide information on 
   
 -  `change group`: if `discrepancy` contains `"changed"` this column will be populated with an arbitrary number that links changed records between `df1` and `df2`
 
--  `exact dup cnt`: if `discrepancy` contains `"exact duplicate"` this column give the number of exact duplicates in `df1` or `df2`
+-  `exact dup cnt`: if `discrepancy` contains `"exact duplicate"` this column gives the number of exact duplicates in `df1` or `df2`
 
 -  `ID dup cnt`: if `discrepancy` contains `"ID duplicate (not exact duplicate)"` this column gives the number of ID duplicates in `df1` or `df2`
 
