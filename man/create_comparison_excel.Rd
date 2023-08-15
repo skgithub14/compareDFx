@@ -4,13 +4,20 @@
 \alias{create_comparison_excel}
 \title{Create Excel report for comparing two data frames}
 \usage{
-create_comparison_excel(comparison, path = "comparison_report.xlsx")
+create_comparison_excel(
+  comparison,
+  path = "comparison_report.xlsx",
+  autoOpen = FALSE
+)
 }
 \arguments{
 \item{comparison}{a list returned from \code{\link[=get_comparison]{get_comparison()}}}
 
 \item{path}{a string, path of the Excel file to be written, default is
 \code{"comparison_report.xlsx"} (must have .xlsx suffix)}
+
+\item{autoOpen}{a logical indicating whether the Excel file should be
+automatically opened, default is \code{FALSE}}
 }
 \value{
 nothing

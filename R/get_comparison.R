@@ -302,13 +302,13 @@ segregate_compare <- function(comparison_df,
     )
 
   new_col_order <- colnames(changed_df2) %>%
-    purrr::map(\(x) rep(x, 2)) %>%
+    purrr::map(~ rep(.x, 2)) %>%
     unlist() %>%
-    purrr::imap(\(x, idx) {
-      if (idx %% 2 == 1) {
-        stringr::str_replace(x, "\\.df2$", ".df1")
+    purrr::imap(~ {
+      if (.y %% 2 == 1) {
+        stringr::str_replace(.x, "\\.df2$", ".df1")
       } else {
-        x
+        .x
       }
     }) %>%
     unlist()
@@ -871,7 +871,7 @@ summarize_compare_cols <- function (df1,
 
   # binary indicator of if a column had changes
   col_chng_ind <- col_chng_cnts %>%
-    purrr::map(\(x) dplyr::if_else(x > 1, 1, x)) %>%
+    purrr::map(~ dplyr::if_else(.x > 1, 1, .x)) %>%
     unlist()
 
   # column classes df1

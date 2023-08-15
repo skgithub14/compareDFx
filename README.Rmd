@@ -125,7 +125,8 @@ Finally, we can produce a multi-tab, color-coded MS Excel report of our comparis
 ```{r}
 dir <- system.file("extdata", package = "compareDFx")
 create_comparison_excel(comparison, 
-                        path = file.path(dir, "comparison_report.xlsx"))
+                        path = file.path(dir, "comparison_report.xlsx"),
+                        autoOpen = TRUE)
 ```
 
 

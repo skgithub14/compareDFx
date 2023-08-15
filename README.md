@@ -224,7 +224,9 @@ comparison using `create_comparison_excel()`:
 ``` r
 dir <- system.file("extdata", package = "compareDFx")
 create_comparison_excel(comparison, 
-                        path = file.path(dir, "comparison_report.xlsx"))
+                        path = file.path(dir, "comparison_report.xlsx"),
+                        autoOpen = TRUE)
+#> [1] 0
 ```
 
 ![Screen shot from ‘all’ tab of
