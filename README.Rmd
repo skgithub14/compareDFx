@@ -24,7 +24,13 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/skgithub14/compareDFx/branch/master/graph/badge.svg)](https://app.codecov.io/gh/skgithub14/compareDFx?branch=master)
 <!-- badges: end -->
 
-{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The comparison analysis shows changes and errors by row and column and provides summary statistics. {compareDFx} can also compare data frames with different columns and column classes. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike.
+{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike and makes identifying data issues and version differences quick and easy. 
+
+![Screen shot from 'summary' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png) 
+
+![Screen shot from 'summary by column' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
+
+![Screen shot from 'all' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
 
 ## Installation
 
@@ -129,11 +135,7 @@ create_comparison_excel(comparison,
                         autoOpen = TRUE)
 ```
 
-![Screen shot from 'summary' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png)
-
-![Screen shot from 'summary by column' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
-
-![Screen shot from 'all' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
+See the screenshots at the top of this page for an idea of what the Excel report looks like, or you can download the file:
 
 [Download comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
