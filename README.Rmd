@@ -127,14 +127,9 @@ create_comparison_excel(comparison,
                         path = file.path(dir, "comparison_report.xlsx"))
 ```
 
-```{r}
+```{r, echo=FALSE}
 xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
 ```
 
-
-MANUAL LINK
-
-[comparison_report.xlsx](inst/extdata/comparison_report.xlsx)
-
-
+![Screen shot from 'all' tab of comparison_report.xlsx](inst/extdata/comparison_report_screenshot.png)
 
