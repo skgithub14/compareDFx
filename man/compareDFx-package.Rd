@@ -4,9 +4,9 @@
 \name{compareDFx-package}
 \alias{compareDFx}
 \alias{compareDFx-package}
-\title{compareDFx: Compare Data Frame Versions, a CompareDF Extension}
+\title{compareDFx: Compare Data Frame Versions in R and MS Excel}
 \description{
-Compares two data frames with a detailed Excel report
+Compares two data frames with detailed reporting. The report can be analyzed natively in R or in MS Excel. The comparison analysis shows changes and errors by row and column and provides summary statistics. compareDFx can also compare data frames with different columns and column classes. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which can easily be used by a non-R users.
 }
 \seealso{
 Useful links:

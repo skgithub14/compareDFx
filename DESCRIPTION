@@ -1,10 +1,15 @@
 Package: compareDFx
-Title: Compare Data Frame Versions, a CompareDF Extension
+Title: Compare Data Frame Versions in R and MS Excel
 Version: 0.0.0.9000
 Authors@R: 
     person("Stephen", "Knapp", , "stephen@knappconsultingllc.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5101-4555"))
-Description: Compares two data frames with a detailed Excel report
+Description: Compares two data frames with detailed reporting. The report can be 
+    analyzed natively in R or in MS Excel. The comparison analysis shows changes 
+    and errors by row and column and provides summary statistics. compareDFx can 
+    also compare data frames with different columns and column classes. The MS 
+    Excel report is a multi-tab workbook that color codes additions, deletions, 
+    and changes which can easily be used by a non-R users.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -24,3 +29,6 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
+LazyData: true

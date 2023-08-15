@@ -37,6 +37,45 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(compareDFx)
-## basic example code
+
+# view the raw data
+compareDFx::df1
+compareDFx::df2
+```
+
+
+```{r}
+# columns that collectively make a unique ID for each row in df1 or df2
+id_cols <- c("id1", "id2")
+```
+
+
+```{r}
+comparison <- get_comparison(df1, df2, id_cols)
+```
+
+```{r}
+comparison$row_summary
+```
+
+
+```{r}
+comparison$col_summary_simple
+```
+
+
+```{r}
+comparison$col_summary_by_col
+```
+
+
+```{r}
+comparison$all
+```
+
+
+```{r}
+tmp_dir <- tempdir()
+create_comparison_excel(comparison, path = file.path(tmp_dir, "comparison_report.xlsx"))
 ```
 
