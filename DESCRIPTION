@@ -15,6 +15,7 @@ Imports:
     compareDF,
     dplyr,
     magrittr,
+    openxlsx,
     purrr,
     stats,
     stringr,

@@ -15,22 +15,35 @@ get_comparison(df1, df2, id_cols, tolerance = 1e-05)
 equal, default is \code{0.00001}}
 }
 \value{
-a named list of data frames with elements:
+a named list with elements:
 \itemize{
-\item \code{col_summary_simple}: high level summary statistics of columns
-\item \code{col_summary_by_col}: comparison summary statistics by column name
-\item \code{row_summary}: comparison summary statistics by row
-\item \code{all}: A data from the other list elements in one data frame
-\item \code{matched}: matching rows
-\item \code{adds}: added rows
-\item \code{dels}: deleted rows
-\item \code{changed}: changed rows, top-bottom view
-\item \code{changed_lr}: changed rows, left-right view
-\item \code{exact_dups}: exact duplicate rows
-\item \code{id_dups}: ID duplicate rows
-\item \code{id_NA}: Rows with with \code{NA} ID values
-\item \code{df1}: The original df1
-\item \code{df2}: The original df2
+\item \code{col_summary_simple}: high level summary statistics of columns, data frame
+\item \code{col_summary_by_col}: comparison summary statistics by column name, data frame
+\item \code{row_summary}: comparison summary statistics by row, data frame
+\item \code{all}: data frame with all data from \code{df1} and \code{df2}
+\item \code{all_index_by_col}: a list of row indices by column of \code{all} where
+\code{df1} and \code{df2} have different values
+\item \code{matched}: data frame with rows of \code{df1} and \code{df2} that match exactly
+\item \code{adds}: data frame with additions in \code{df1}
+\item \code{dels}: data frame with deletions from \code{df2}
+\item \code{changed}: data frame that compares \code{df1} and \code{df2} changed rows,
+a top-bottom view
+\item \code{change_index_by_col}: a list of row indices by column of \code{changed} where
+\code{df1} and \code{df2} have different values
+\item \code{changed_lr}: data frame that compares \code{df1} and \code{df2} changed rows,
+a left-right view
+\item \code{change_index_by_col_lr}: a list of row indices by column of \code{changed_lr}
+where \code{df1} and \code{df2} have different values
+\item \code{exact_dups}: a data frame that lists rows that are exact duplicates of
+each other, by \code{df1} and \code{df2}
+\item \code{id_dups}: a data frame that lists rows that have duplicated ID column
+values (meaning IDs are not unique in \code{df1} or \code{df2}) but which are not
+exact duplicates (at least one non-ID column is different from it duplicate
+row)
+\item \code{id_NA}: a data frame of rows with with \code{NA} ID values from \code{df1} and \code{df2}
+\item \code{df1}: the original \code{df1} data frame
+\item \code{df2}: the original \code{df2} data frame
+\item \code{id_cols}: a vector of column names that collectively make a unique row ID
 }
 }
 \description{

@@ -208,29 +208,16 @@ comp_list
 
 
 ```{r}
-get_comparison(df1, df2, id_cols)
+comparison <- get_comparison(df1, df2, id_cols)
 ```
 
 
 
 ```{r}
-#' Create Excel report for comparing two data frames
-#' 
-#' Creates a multi-tab report for comparing two data frames with one 
-#' tab for each element of an object returned by [get_comparison()]
-#' 
-#' @param path a string, path of the Excel file to be written
-#' @param comparison a list returned from [get_comparison()]
-#' 
-#' @returns nothing
-#' @export
-#' 
-create_comparison_excel <- function (path, comparison) {
-  
-  
-  
-}
+# create excel report
+create_comparison_excel(comparison)
 ```
+
 
 
 
