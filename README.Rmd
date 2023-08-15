@@ -2,6 +2,7 @@
 output: github_document
 resource_files:
   - inst/extdata/comparison_report.xlsx
+  - inst/extdata/comparison_report_screenshot.png
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -127,9 +128,14 @@ create_comparison_excel(comparison,
                         path = file.path(dir, "comparison_report.xlsx"))
 ```
 
+
+Screen shot from 'all' tab of comparison_report.xlsx:
+
+![Screen shot from 'all' tab of comparison_report.xlsx](inst/extdata/comparison_report_screenshot.png)
+
+See the full MS Excel file here:
+
 ```{r, echo=FALSE}
 xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
 ```
-
-![Screen shot from 'all' tab of comparison_report.xlsx](inst/extdata/comparison_report_screenshot.png)
 
