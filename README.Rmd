@@ -127,7 +127,7 @@ create_comparison_excel(comparison,
                         path = file.path(dir, "comparison_report.xlsx"))
 ```
 
-```{r, echo=FALSE}
+```{r}
 xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
 ```
 
