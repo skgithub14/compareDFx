@@ -133,7 +133,7 @@ Screen shot from 'all' tab of comparison_report.xlsx:
 
 ![Screen shot from 'all' tab of comparison_report.xlsx](inst/extdata/comparison_report_screenshot.png)
 
-See the full MS Excel file here:
+See the full MS Excel file here (only clickable on when viewing on [https://skgithub14.github.io/compareDFx/](https://skgithub14.github.io/compareDFx/)):
 
 ```{r, echo=FALSE}
 xfun::embed_file(file.path(dir, "comparison_report.xlsx"))
