@@ -98,20 +98,23 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
 #'  * `col_summary_simple`: high level summary statistics of columns, data frame
 #'  * `col_summary_by_col`: comparison summary statistics by column name, data frame
 #'  * `row_summary`: comparison summary statistics by row, data frame
-#'  * `all`: data frame with all data from `df1` and `df2`
+#'  * `all`: data frame with all data from `df1` and `df2` with comparison
+#'   annotations
 #'  * `all_index_by_col`: a list of row indices by column of `all` where
-#'   `df1` and `df2` have different values
+#'   `df1` and `df2` have different values, this is used by
+#'   [create_comparison_excel()] for color-coding changes
+#'  * `all_lr`: the same as `all` but where the columns from `df1` and `df2` are
+#'   viewed side-by-side instead of top-to-bottom
+#'  * `all_index_by_col_lr`: a list of row indices by column of `all_lr` where
+#'   `df1` and `df2` have different values, this is used by
+#'   [create_comparison_excel()] for color-coding changes
 #'  * `matched`: data frame with rows of `df1` and `df2` that match exactly
 #'  * `adds`: data frame with additions in `df1`
 #'  * `dels`: data frame with deletions from `df2`
 #'  * `changed`: data frame that compares `df1` and `df2` changed rows,
 #'   a top-bottom view
-#'  * `change_index_by_col`: a list of row indices by column of `changed` where
-#'   `df1` and `df2` have different values
 #'  * `changed_lr`: data frame that compares `df1` and `df2` changed rows,
 #'   a left-right view
-#'  * `change_index_by_col_lr`: a list of row indices by column of `changed_lr`
-#'   where `df1` and `df2` have different values
 #'  * `exact_dups`: a data frame that lists rows that are exact duplicates of
 #'   each other, by `df1` and `df2`
 #'  * `id_dups`: a data frame that lists rows that have duplicated ID column
@@ -124,8 +127,6 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
 #'  * `id_cols`: a vector of column names that collectively make a unique row ID
 #'  * `cc_out`: a list output from [compare_cols()] that details which columns
 #'   `df1` and `df2` have in common and the columns they do not have in common
-#'
-#' @export
 #'
 segregate_compare <- function(comparison_df,
                               comparison_table_diff,
@@ -183,7 +184,7 @@ segregate_compare <- function(comparison_df,
 
   all_dat2 <- all_dat1 %>%
     dplyr::left_join(dup_cnt, by = c(id_cols, "source")) %>%
-    dplyr::relocate(`exact dup cnt`, .after = id_cols[length(id_cols)]) %>%
+    dplyr::relocate(`exact dup cnt`, .after = source) %>%
 
     # mark whether a pure addition, deletion, or change
     dplyr::group_by(grp) %>%
@@ -195,7 +196,7 @@ segregate_compare <- function(comparison_df,
         all(chng_type %in% c("-", "+")) ~ "changed",
         TRUE ~ NA_character_
       ),
-      .before = `exact dup cnt`
+      .before = source
     ) %>%
     dplyr::select(-chng_type) %>%
 
@@ -219,7 +220,7 @@ segregate_compare <- function(comparison_df,
     ) %>%
 
     # change grp column to "change group" column, only populated for changes
-    dplyr::relocate(grp, .after = discrepancy) %>%
+    dplyr::relocate(grp, .after = source) %>%
     dplyr::mutate(
       grp = dplyr::if_else(stringr::str_detect(discrepancy, "changed"),
                            grp,
@@ -230,9 +231,6 @@ segregate_compare <- function(comparison_df,
     # create dummy ID dup column
     dplyr::mutate(`ID dup cnt` = NA_real_,
                   .after = `exact dup cnt`) %>%
-
-    # for matched data, only keep one copy from df1
-    dplyr::filter(!(stringr::str_detect(discrepancy, "matched") & source == "df2")) %>%
 
     # arrange by ID columns
     dplyr::arrange(dplyr::across(tidyselect::all_of(id_cols)))
@@ -253,7 +251,7 @@ segregate_compare <- function(comparison_df,
     dplyr::select(-`ID dup cnt`)
   matched <- all_dat2 %>%
     dplyr::filter(stringr::str_detect(discrepancy, "matched")) %>%
-    dplyr::select(-c(source, `change group`, `ID dup cnt`))
+    dplyr::select(-c(`change group`, `ID dup cnt`))
 
   ## for all data, add in the ID NA and ID dup segments
   # force the classes to match
@@ -289,7 +287,98 @@ segregate_compare <- function(comparison_df,
     dplyr::bind_rows(df2_id_dups) %>%
     dplyr::bind_rows(df1_id_NA) %>%
     dplyr::bind_rows(df2_id_NA) %>%
-    dplyr::arrange(dplyr::across(tidyselect::all_of(id_cols)))
+    dplyr::arrange(dplyr::across(c(tidyselect::all_of(id_cols), source)))
+
+  ## create left/right view of all data
+  # first create dummy rows for additions and deletions
+  all_lr_tmp <- all_dat3 %>%
+    dplyr::mutate(
+      discrepancy = dplyr::case_when(
+        stringr::str_detect(discrepancy, "ID duplicate") ~
+          stringr::str_replace(discrepancy, "ID duplicate", paste(source, "ID duplicate")),
+        stringr::str_detect(discrepancy, "ID contains `NA`") ~
+          stringr::str_replace(discrepancy, "ID contains `NA`", paste(source, "ID contains `NA`")),
+        TRUE ~ discrepancy,
+      ),
+      tmp_col = dplyr::if_else(
+        stringr::str_detect(discrepancy,
+                            "addition|deletion|ID duplicate|ID contains `NA`"),
+        "orig,dummy",
+        "orig"
+      )
+    ) %>%
+    tidyr::separate_rows(tmp_col, sep = ",") %>%
+    dplyr::mutate(
+      source = dplyr::case_when(
+        tmp_col == "dummy" & source == "df1" ~ "df2",
+        tmp_col == "dummy" & source == "df2" ~ "df1",
+        TRUE ~ source
+      ),
+      dplyr::across(c(`exact dup cnt`, `ID dup cnt`),
+                    ~ dplyr::if_else(
+                      tmp_col == "dummy",
+                      NA_real_,
+                      .
+                    )),
+      dplyr::across(-c(source,
+                       discrepancy,
+                       `change group`,
+                       `exact dup cnt`,
+                       `ID dup cnt`,
+                       tidyselect::all_of(id_cols)),
+                    ~ dplyr::if_else(tmp_col == "dummy", NA, .)
+                    )
+    ) %>%
+    dplyr::select(-tmp_col) %>%
+    dplyr::arrange(dplyr::across(c(tidyselect::all_of(id_cols), source)))
+
+  all_lr_df2 <- all_lr_tmp %>%
+    dplyr::filter(source == "df2") %>%
+    dplyr::select(-c(
+      source,
+      discrepancy,
+      `change group`,
+      tidyselect::all_of(id_cols)
+    )) %>%
+    dplyr::rename_with(
+      .cols = tidyselect::everything(),
+      ~ paste0(., ".df2")
+    )
+
+  all_lr_df1 <- all_lr_tmp %>%
+    dplyr::filter(source == "df1") %>%
+    dplyr::rename_with(
+      .cols = -c(
+        source,
+        discrepancy,
+        `change group`,
+        tidyselect::all_of(id_cols)
+      ),
+      ~ paste0(., ".df1")
+    ) %>%
+    dplyr::select(-source)
+
+  all_lr_col_order <- colnames(all_lr_df2) %>%
+    purrr::map(~ rep(.x, 2)) %>%
+    unlist() %>%
+    purrr::imap(~ {
+      if (.y %% 2 == 1) {
+        stringr::str_replace(.x, "\\.df2$", ".df1")
+      } else {
+        .x
+      }
+    }) %>%
+    unlist()
+
+  all_lr <- all_lr_df1 %>%
+    dplyr::bind_cols(all_lr_df2) %>%
+    dplyr::select(
+      discrepancy,
+      `change group`,
+      tidyselect::all_of(id_cols),
+      tidyselect::all_of(all_lr_col_order)
+    ) %>%
+    dplyr::relocate(tidyselect::all_of(id_cols), .after = `ID dup cnt.df2`)
 
   # create alternate left/right view for changes
   changed_df2 <- changed %>%
@@ -379,7 +468,7 @@ segregate_compare <- function(comparison_df,
   change_locations <- comparison_table_diff %>%
     dplyr::select(-tidyselect::all_of(id_cols)) %>%
     dplyr::left_join(change_ids, by = c("grp" = "change group")) %>%
-    dplyr::relocate(id_cols, .after = "grp") %>%
+    dplyr::relocate(tidyselect::all_of(id_cols), .after = "grp") %>%
     dplyr::filter(dplyr::if_all(tidyselect::all_of(id_cols), ~ !is.na(.))) %>%
     dplyr::group_by(grp) %>%
     dplyr::mutate(n = dplyr::row_number(), .after = "grp") %>%
@@ -408,40 +497,32 @@ segregate_compare <- function(comparison_df,
                                 ))
     )
 
-  # get change indices for the all, top/bottom and left/right change views in
-  #  separate lists
-  tmp_changed <- dplyr::mutate(changed,
-                               index = dplyr::row_number(),
-                               .before = source)
-  tmp_changed_lr <- dplyr::mutate(changed_lr,
-                                  index = dplyr::row_number(),
-                                  .before = id_cols[1])
+  # get change indices for the all and all_lr in separate lists which can
+  #  be used by `create_comparison_excel()` to color code changes
   tmp_all <- dplyr::mutate(all_dat3,
                            index = dplyr::row_number(),
                            .before = source)
+  tmp_all_lr <- dplyr::mutate(all_lr,
+                              index = dplyr::row_number(),
+                              .before = discrepancy)
   non_index_cols <- setdiff(colnames(change_locations), c("grp", id_cols))
-  change_index_by_col <- vector(mode = "list", length = length(non_index_cols)) %>%
-    setNames(non_index_cols)
-  change_index_by_col_lr <- vector(mode = "list", length = length(non_index_cols)) %>%
-    setNames(non_index_cols)
   all_index_by_col <- vector(mode = "list", length = length(non_index_cols)) %>%
+    setNames(non_index_cols)
+  all_index_by_col_lr <- vector(mode = "list", length = length(non_index_cols)) %>%
     setNames(non_index_cols)
   for (col in non_index_cols) {
     grps <- change_locations[[col]]
     grps <- grps[which(!is.na(grps))]
     grps <- as.numeric(grps)
     if (length(grps) > 0) {
-      ind <- tmp_changed$index[which(tmp_changed$`change group` %in% grps)]
-      ind_lr <- tmp_changed_lr$index[which(tmp_changed_lr$`change group` %in% grps)]
       ind_all <- tmp_all$index[which(tmp_all$`change group` %in% grps)]
+      ind_all_lr <- tmp_all$index[which(tmp_all_lr$`change group` %in% grps)]
     } else {
-      ind <- NA_real_
-      ind_lr <- NA_real_
       ind_all <- NA_real_
+      ind_all_lr <- NA_real_
     }
-    change_index_by_col[[col]] <- ind
-    change_index_by_col_lr[[col]] <- ind_lr
     all_index_by_col[[col]] <- ind_all
+    all_index_by_col_lr[[col]] <- ind_all_lr
   }
 
   return(
@@ -451,13 +532,13 @@ segregate_compare <- function(comparison_df,
       row_summary = row_summary,
       all = all_dat3,
       all_index_by_col = all_index_by_col,
+      all_lr = all_lr,
+      all_index_by_col_lr = all_index_by_col_lr,
       matched = matched,
       adds = adds,
       dels = dels,
       changed = changed,
-      change_index_by_col = change_index_by_col,
       changed_lr = changed_lr,
-      change_index_by_col_lr = change_index_by_col_lr,
       exact_dups = exact_dups,
       id_dups = id_dups,
       id_NA = id_NA,
@@ -482,8 +563,6 @@ segregate_compare <- function(comparison_df,
 #'  * `both`: a character vector with the column names in both `df1` and `df2`
 #'  * `df1_only`: a character vector with the column names only in `df1`
 #'  * `df2_only`: a character vector with the column names only in `df2`
-#'
-#' @export
 #'
 compare_cols <- function(df1, df2) {
   both <- intersect(colnames(df1), colnames(df2))
@@ -577,8 +656,6 @@ insert_dummy_cols <- function(df1, df2, cc_out, id_cols) {
 #'  * `df1`: a modified data frame `df1`
 #'  * `df2`: a modified data frame `df2`
 #'
-#' @export
-#'
 standardize_col_order <- function(df1, df2, id_cols) {
   not_id_cols <- setdiff(colnames(df1), id_cols)
 
@@ -618,7 +695,6 @@ standardize_col_order <- function(df1, df2, id_cols) {
 #'  * `no_dups`: this is `df` with all `id_dups` row removed and only one copy
 #'   of each `exact_dups` row.
 #'
-#' @export
 find_dups <- function(df, id_cols, source) {
 
   # check for id columns with NA values
@@ -722,7 +798,6 @@ find_dups <- function(df, id_cols, source) {
 #'
 #' @returns a list returned by [compareDF::compare_df()]
 #'
-#' @export
 compare_df_wrapper <- function(df1_no_dups,
                                df2_no_dups,
                                id_cols,
@@ -780,8 +855,6 @@ compare_df_wrapper <- function(df1_no_dups,
 #' @param id_NA an `id_NA` list element returned from [segregate_compare()]
 #'
 #' @returns a data frame with three columns: `Rows`, `df1 data`, `df2 data`
-#'
-#' @export
 #'
 summarize_compare_rows <- function(df1,
                                    df2,
@@ -882,8 +955,6 @@ summarize_compare_rows <- function(df1,
 #' @returns a named list containing two data frames:
 #'  * `report_simple` a data frame with higher level summary statistics
 #'  * `report_by_col` a data frame that lists summary statistics by column name
-#'
-#' @export
 #'
 summarize_compare_cols <- function (df1,
                                     df2,

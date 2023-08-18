@@ -50,20 +50,23 @@ a named list with elements:
 \item \code{col_summary_simple}: high level summary statistics of columns, data frame
 \item \code{col_summary_by_col}: comparison summary statistics by column name, data frame
 \item \code{row_summary}: comparison summary statistics by row, data frame
-\item \code{all}: data frame with all data from \code{df1} and \code{df2}
+\item \code{all}: data frame with all data from \code{df1} and \code{df2} with comparison
+annotations
 \item \code{all_index_by_col}: a list of row indices by column of \code{all} where
-\code{df1} and \code{df2} have different values
+\code{df1} and \code{df2} have different values, this is used by
+\code{\link[=create_comparison_excel]{create_comparison_excel()}} for color-coding changes
+\item \code{all_lr}: the same as \code{all} but where the columns from \code{df1} and \code{df2} are
+viewed side-by-side instead of top-to-bottom
+\item \code{all_index_by_col_lr}: a list of row indices by column of \code{all_lr} where
+\code{df1} and \code{df2} have different values, this is used by
+\code{\link[=create_comparison_excel]{create_comparison_excel()}} for color-coding changes
 \item \code{matched}: data frame with rows of \code{df1} and \code{df2} that match exactly
 \item \code{adds}: data frame with additions in \code{df1}
 \item \code{dels}: data frame with deletions from \code{df2}
 \item \code{changed}: data frame that compares \code{df1} and \code{df2} changed rows,
 a top-bottom view
-\item \code{change_index_by_col}: a list of row indices by column of \code{changed} where
-\code{df1} and \code{df2} have different values
 \item \code{changed_lr}: data frame that compares \code{df1} and \code{df2} changed rows,
 a left-right view
-\item \code{change_index_by_col_lr}: a list of row indices by column of \code{changed_lr}
-where \code{df1} and \code{df2} have different values
 \item \code{exact_dups}: a data frame that lists rows that are exact duplicates of
 each other, by \code{df1} and \code{df2}
 \item \code{id_dups}: a data frame that lists rows that have duplicated ID column
