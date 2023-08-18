@@ -16,15 +16,6 @@ color codes additions, deletions, and changes which is ideal for R users
 and non-R users alike and makes identifying data issues and version
 differences quick and easy.
 
-![Screen shot from ‘summary’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png)
-
-![Screen shot from ‘summary by column’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
-
-![Screen shot from ‘data_top_bottom’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
-
 ## Installation
 
 You can install the development version of {compareDFx} like so:
@@ -88,7 +79,23 @@ knitr::kable(compareDFx::df2)
 
 Producing the report takes just a few lines of code:
 
-    #> [1] 0
+``` r
+library(compareDFx)
+
+# identify the columns which collectively make a unique row ID
+id_cols <- c("id1", "id2")
+
+# run the comparison
+comparison <- get_comparison(df1, df2, id_cols)
+
+# set a working directory to put the excel report, this can be anything
+dir <- system.file("extdata", package = "compareDFx")
+
+# create the excel report
+create_comparison_excel(comparison, 
+                        path = file.path(dir, "comparison_report.xlsx"),
+                        autoOpen = FALSE)
+```
 
 Now we have a multi-tab, color-coded MS Excel report that highlights new
 changes from `df1` in green and old values from `df2` in red. The report
@@ -100,25 +107,37 @@ Excel report looks like, or you can download the file:
 [Download
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
-There are six tabs:
+There are six tabs in the workbook:
 
-- `summary`: summary statistics
+1.  summary: summary statistics
 
-- `summay by column`: column summary statistics
+![Screen shot from ‘summary’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png)
 
-- `data_top_bottom`: the combined data displayed so that each row of
-  `df1` is directly above its `df2` counter part.
+2.  summary by column: column summary statistics
 
-- `data_left_right`: the same data as shown in `data_top_bottom`, but
-  where `df1` columns are immediately to the left of their `df2` counter
-  part.
+![Screen shot from ‘summary by column’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
 
-- `df1`: the raw data from `df1`, for reference
+3.  data top-bottom: the combined data displayed so that each row of
+    `df1` is directly above its `df2` counter part.
 
-- `df2`: the raw data from `df2`, for reference
+![Screen shot from ‘data_top_bottom’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
 
-On the data tabs (`data_top_bottom` and `data_left_right`), you will see
-some extra columns that report useful comparison information:
+4.  data left-right: the same data as shown in `data_top_bottom`, but
+    where the `df1` columns are immediately to the left of their `df2`
+    counter part.
+
+![Screen shot from ‘data_top_bottom’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
+
+5.  df1: the raw data from `df1`, for reference
+
+6.  df2: the raw data from `df2`, for reference
+
+The data tabs (data top-bottom and data left-right) to the far left, you
+will see some extra columns that report useful comparison information:
 
 - `source`: whether the data in the row came from `df1` or `df2`
 
@@ -153,6 +172,9 @@ some extra columns that report useful comparison information:
     non-`NA` values for all `id_cols` therefore these rows will not be
     marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`.
     The user should fix these errors and re-run the comparison.
+
+The next three columns are hidden by default, but can be shown by
+clicking the “+” in the top left corner of the worksheet:
 
 - `change group`: if `discrepancy` contains `"changed"` this column will
   be populated with an arbitrary number that links changed records

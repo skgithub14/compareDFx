@@ -175,9 +175,9 @@ create_comparison_excel <- function (comparison,
 
       # set-up the worksheet and write the data
       if (.x == "all") {
-        sname = "data_top_bottom"
+        sname = "data top-bottom"
       } else if (.x == "all_lr") {
-        sname = "data_left_right"
+        sname = "data left-right"
       } else {
         sname = .x
       }
