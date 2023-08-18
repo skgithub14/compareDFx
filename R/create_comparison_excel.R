@@ -88,7 +88,7 @@ create_comparison_excel <- function (comparison,
   openxlsx::setColWidths(wb,
                          sheet = summary_sname,
                          cols = 1:ncol(comparison$row_summary),
-                         widths = c(15, 5, 5, 65, 65))
+                         widths = c(15, 5, 5, 65))
 
   # one sentence summary
   if (all(comparison$all$discrepancy == "matched")) {
