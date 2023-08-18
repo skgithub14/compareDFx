@@ -101,11 +101,11 @@ path <- file.path(dir, fname)
 create_comparison_excel(comparison, path = path)
 ```
 
-Now we have a multi-tab, color-coded MS Excel report with summary statistics. On the data tabs of the report, all cells from `df1` will have a white background and all cells from `df2` will have a <mark style="background-color: "#D3D3D3">grey background</mark>. The text is colored accordingly:
+Now we have a multi-tab, color-coded MS Excel report with summary statistics. On the data tabs of the report, all cells from `df1` will have a white background and all cells from `df2` will have a grey background. The text is colored accordingly:
 
--  \textcolor{green}{Green text}: cell values in `df1` that are different from `df2`
+-  \textcolor{Green text}{green}: cell values in `df1` that are different from `df2`
 
--  \textcolor{red}{Red text}: cell values in `df2` that are different from `df1`
+-  \textcolor{Red text}{red}: cell values in `df2` that are different from `df1`
 
 -  Black text: cell values that are the unchanged between `df1` and `df2`
 

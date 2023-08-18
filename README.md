@@ -114,9 +114,8 @@ create_comparison_excel(comparison, path = "comparison_report.xlsx")
 
 Now we have a multi-tab, color-coded MS Excel report with summary
 statistics. On the data tabs of the report, all cells from `df1` will
-have a white background and all cells from `df2` will have a \<mark
-style=“background-color:”\#D3D3D3”\>grey background</mark>. The text is
-colored accordingly:
+have a white background and all cells from `df2` will have a grey
+background. The text is colored accordingly:
 
 - : cell values in `df1` that are different from `df2`
 
