@@ -46,8 +46,8 @@ frames:
 
 ``` r
 library(compareDFx)
-df1 <- compareDFx::df1
-df2 <- compareDFx::df2
+data(df1)
+data(df2)
 ```
 
 <details>
