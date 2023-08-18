@@ -854,7 +854,7 @@ compare_df_wrapper <- function(df1_no_dups,
 #' @param id_dups an `id_dups` list element returned from [segregate_compare()]
 #' @param id_NA an `id_NA` list element returned from [segregate_compare()]
 #'
-#' @returns a data frame with three columns: `Rows`, `df1 data`, `df2 data`
+#' @returns a data frame with three columns: `Rows`, `df1`, `df2`
 #'
 summarize_compare_rows <- function(df1,
                                    df2,
@@ -909,26 +909,11 @@ summarize_compare_rows <- function(df1,
     "ID only duplicates", id_dup_row_cnt1, id_dup_row_cnt2,
     "`NA` ID values", id_na_cnt1, id_na_cnt2
   ) %>%
-
     dplyr::mutate(
       Issues = dplyr::case_when(
         Rows == "ID only duplicates" & (`df1` > 0 | `df2`) > 0 ~ "Fix these records and re-run comparison",
         Rows == "`NA` ID values" & (`df1` > 0 | `df2`) > 0 ~ "Fix these records and re-run comparison",
         TRUE ~ NA_character_
-      ),
-
-
-      `See` = dplyr::recode(
-        Rows,
-        "Total" = "all (for a comparison), or df1 and df2 (for the raw data)",
-        "Added" = "adds",
-        "Deleted" = "dels",
-        "Changed" = "changed (top/bottom view) or changed_lr (left/right view)",
-        "Matched" = "matched",
-        "Exact duplicates" = "exact_dups",
-        "ID only duplicates" = "id_dups",
-        "`NA` ID values" = "id_NA",
-        .default = NA_character_
       )
     )
 
