@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">compareDFx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,20 +76,23 @@ equal, default is <code>0.00001</code></p></dd>
 <p>a named list with elements:</p><ul><li><p><code>col_summary_simple</code>: high level summary statistics of columns, data frame</p></li>
 <li><p><code>col_summary_by_col</code>: comparison summary statistics by column name, data frame</p></li>
 <li><p><code>row_summary</code>: comparison summary statistics by row, data frame</p></li>
-<li><p><code>all</code>: data frame with all data from <code>df1</code> and <code>df2</code></p></li>
+<li><p><code>all</code>: data frame with all data from <code>df1</code> and <code>df2</code> with comparison
+annotations</p></li>
 <li><p><code>all_index_by_col</code>: a list of row indices by column of <code>all</code> where
-<code>df1</code> and <code>df2</code> have different values</p></li>
+<code>df1</code> and <code>df2</code> have different values, this is used by
+<code><a href="create_comparison_excel.html">create_comparison_excel()</a></code> for color-coding changes</p></li>
+<li><p><code>all_lr</code>: the same as <code>all</code> but where the columns from <code>df1</code> and <code>df2</code> are
+viewed side-by-side instead of top-to-bottom</p></li>
+<li><p><code>all_index_by_col_lr</code>: a list of row indices by column of <code>all_lr</code> where
+<code>df1</code> and <code>df2</code> have different values, this is used by
+<code><a href="create_comparison_excel.html">create_comparison_excel()</a></code> for color-coding changes</p></li>
 <li><p><code>matched</code>: data frame with rows of <code>df1</code> and <code>df2</code> that match exactly</p></li>
 <li><p><code>adds</code>: data frame with additions in <code>df1</code></p></li>
 <li><p><code>dels</code>: data frame with deletions from <code>df2</code></p></li>
 <li><p><code>changed</code>: data frame that compares <code>df1</code> and <code>df2</code> changed rows,
 a top-bottom view</p></li>
-<li><p><code>change_index_by_col</code>: a list of row indices by column of <code>changed</code> where
-<code>df1</code> and <code>df2</code> have different values</p></li>
 <li><p><code>changed_lr</code>: data frame that compares <code>df1</code> and <code>df2</code> changed rows,
 a left-right view</p></li>
-<li><p><code>change_index_by_col_lr</code>: a list of row indices by column of <code>changed_lr</code>
-where <code>df1</code> and <code>df2</code> have different values</p></li>
 <li><p><code>exact_dups</code>: a data frame that lists rows that are exact duplicates of
 each other, by <code>df1</code> and <code>df2</code></p></li>
 <li><p><code>id_dups</code>: a data frame that lists rows that have duplicated ID column

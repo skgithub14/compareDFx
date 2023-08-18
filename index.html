@@ -43,7 +43,7 @@
     
     <a class="navbar-brand me-2" href="index.html">compareDFx</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,15 +86,6 @@
 <!-- badges: start -->
 
 <p>{compareDFx} compares two data frames with detailed reporting natively in R or in MS Excel. The MS Excel report is a multi-tab workbook that color codes additions, deletions, and changes which is ideal for R users and non-R users alike and makes identifying data issues and version differences quick and easy.</p>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png" alt=""><p class="caption">Screen shot from ‘summary’ tab of comparison_report.xlsx</p>
-</div>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png" alt=""><p class="caption">Screen shot from ‘summary by column’ tab of comparison_report.xlsx</p>
-</div>
-<div class="figure">
-<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png" alt=""><p class="caption">Screen shot from ‘all’ tab of comparison_report.xlsx</p>
-</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -108,11 +99,16 @@
 <div class="section level2">
 <h2 id="comparing-two-data-frames-using-comparedfx">Comparing two data frames using {compareDFx}<a class="anchor" aria-label="anchor" href="#comparing-two-data-frames-using-comparedfx"></a>
 </h2>
-<p>Using the two example data frames included with the package, <code>df1</code> and <code>df2</code>, we will walk through the {compareDFx} workflow.</p>
+<p>Let’s assume that <code>df1</code> and <code>df2</code> are two versions of the same data set, where <code>df1</code> is the newer version. We want to know exactly which values changed. Using the two example data frames included with {compareDFx}, <code>df1</code> and <code>df2</code>, we will walk through the {compareDFx} workflow.</p>
+<div class="section level3">
+<h3 id="create-the-report">Create the report<a class="anchor" aria-label="anchor" href="#create-the-report"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/skgithub14/compareDFx" class="external-link">compareDFx</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># example data, df1 </span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/skgithub14/compareDFx" class="external-link">compareDFx</a></span><span class="op">)</span></span></code></pre></div>
+<details><summary>
+See the raw data
+</summary><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># example data, df1 </span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="reference/df1.html">df1</a></span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
@@ -286,7 +282,7 @@
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example data, df2</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="reference/df2.html">df2</a></span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -432,649 +428,55 @@
 <td align="left">extra2</td>
 </tr>
 </tbody>
-</table>
-<p>Next, we need to identify the columns which collectively make a unique ID for each row, then we can run the comparison.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">id_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span>
-<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_comparison.html">get_comparison</a></span><span class="op">(</span><span class="va">df1</span>, <span class="va">df2</span>, <span class="va">id_cols</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in get_comparison(df1, df2, id_cols): ID duplicates detected, recommend</span></span>
-<span><span class="co">#&gt; fixing these and re-running `get_comparison()`</span></span>
-<span><span class="co">#&gt; Warning in get_comparison(df1, df2, id_cols): ID columns contain `NA`,</span></span>
-<span><span class="co">#&gt; recommend fixing these and re-running `get_comparison()`</span></span>
-<span><span class="co">#&gt; df1 and df2 have different columns therefore no records are recorded as 'matched'</span></span></code></pre></div>
-<p>The output of <code><a href="reference/get_comparison.html">get_comparison()</a></code> is a list with elements:</p>
+</table></details><p>First, we need to identify which columns make up a row’s unique ID. {compareDFx} uses a row’s unique ID to evaluate what changed between <code>df1</code> and <code>df2</code>. For our example, the columns <code>id1</code> and <code>id2</code> are the ID columns.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "col_summary_simple"     "col_summary_by_col"     "row_summary"           </span></span>
-<span><span class="co">#&gt;  [4] "all"                    "all_index_by_col"       "matched"               </span></span>
-<span><span class="co">#&gt;  [7] "adds"                   "dels"                   "changed"               </span></span>
-<span><span class="co">#&gt; [10] "change_index_by_col"    "changed_lr"             "change_index_by_col_lr"</span></span>
-<span><span class="co">#&gt; [13] "exact_dups"             "id_dups"                "id_NA"                 </span></span>
-<span><span class="co">#&gt; [16] "df1"                    "df2"                    "id_cols"               </span></span>
-<span><span class="co">#&gt; [19] "cc_out"</span></span></code></pre></div>
-<p>See the <code><a href="reference/get_comparison.html">get_comparison()</a></code> documentation for details on each list element. Below we will view the most important ones.</p>
-<p>Summary statistics are provided by <code>$row_summary</code>, <code>$col_summary_simple</code>, and <code>$col_summary_by_col</code>.</p>
+<code class="sourceCode R"><span><span class="va">id_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span></code></pre></div>
+<p>If there are problems with the ID columns (ie there are <code>NA</code> values or the IDs are not unique), the final report will flag those discrepancies.</p>
+<p>Now we can run the comparison and generate the report in Excel:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">row_summary</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="15%">
-<col width="3%">
-<col width="3%">
-<col width="31%">
-<col width="45%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Rows</th>
-<th align="right">df1</th>
-<th align="right">df2</th>
-<th align="left">Issues</th>
-<th align="left">See</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Total</td>
-<td align="right">10</td>
-<td align="right">8</td>
-<td align="left">NA</td>
-<td align="left">all (for a comparison), or df1 and df2 (for the raw data)</td>
-</tr>
-<tr class="even">
-<td align="left">Added</td>
-<td align="right">1</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-<td align="left">adds</td>
-</tr>
-<tr class="odd">
-<td align="left">Deleted</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">NA</td>
-<td align="left">dels</td>
-</tr>
-<tr class="even">
-<td align="left">Changed</td>
-<td align="right">5</td>
-<td align="right">5</td>
-<td align="left">NA</td>
-<td align="left">changed (top/bottom view) or changed_lr (left/right view)</td>
-</tr>
-<tr class="odd">
-<td align="left">Matched</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">NA</td>
-<td align="left">matched</td>
-</tr>
-<tr class="even">
-<td align="left">Exact duplicates</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="left">NA</td>
-<td align="left">exact_dups</td>
-</tr>
-<tr class="odd">
-<td align="left">ID only duplicates</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="left">Fix these records and re-run comparison</td>
-<td align="left">id_dups</td>
-</tr>
-<tr class="even">
-<td align="left">
-<code>NA</code> ID values</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">Fix these records and re-run comparison</td>
-<td align="left">id_NA</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">col_summary_simple</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="5%">
-<col width="5%">
-<col width="73%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Columns</th>
-<th align="right">df1</th>
-<th align="right">df2</th>
-<th align="left">Issues</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Total</td>
-<td align="right">12</td>
-<td align="right">12</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">Added</td>
-<td align="right">1</td>
-<td align="right">NA</td>
-<td align="left">df1 and df2 have different columns therefore no records are ‘matched’</td>
-</tr>
-<tr class="odd">
-<td align="left">Deleted</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">df1 and df2 have different columns therefore no records are ‘matched’</td>
-</tr>
-<tr class="even">
-<td align="left">Changed</td>
-<td align="right">4</td>
-<td align="right">4</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">Mismatch class</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="left">NA</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">col_summary_by_col</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="10%">
-<col width="10%">
-<col width="11%">
-<col width="19%">
-<col width="14%">
-<col width="14%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Column</th>
-<th align="left">In df1</th>
-<th align="left">In df2</th>
-<th align="right">Changes</th>
-<th align="left">Classes match</th>
-<th align="left">df1 class</th>
-<th align="left">df2 class</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">id1</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">numeric</td>
-<td align="left">numeric</td>
-</tr>
-<tr class="even">
-<td align="left">id2</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">character</td>
-<td align="left">character</td>
-</tr>
-<tr class="odd">
-<td align="left">num</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">numeric</td>
-<td align="left">numeric</td>
-</tr>
-<tr class="even">
-<td align="left">char</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">character</td>
-<td align="left">character</td>
-</tr>
-<tr class="odd">
-<td align="left">int</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">integer</td>
-<td align="left">integer</td>
-</tr>
-<tr class="even">
-<td align="left">log</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">logical</td>
-<td align="left">logical</td>
-</tr>
-<tr class="odd">
-<td align="left">date</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">Date</td>
-<td align="left">Date</td>
-</tr>
-<tr class="even">
-<td align="left">class_num_char</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">FALSE</td>
-<td align="left">numeric</td>
-<td align="left">character</td>
-</tr>
-<tr class="odd">
-<td align="left">class_num_log</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">0</td>
-<td align="left">FALSE</td>
-<td align="left">numeric</td>
-<td align="left">logical</td>
-</tr>
-<tr class="even">
-<td align="left">dec_diff_ref</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">4</td>
-<td align="left">TRUE</td>
-<td align="left">numeric</td>
-<td align="left">numeric</td>
-</tr>
-<tr class="odd">
-<td align="left">dec_diff</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="right">2</td>
-<td align="left">TRUE</td>
-<td align="left">numeric</td>
-<td align="left">numeric</td>
-</tr>
-<tr class="even">
-<td align="left">extra1</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-<td align="right">5</td>
-<td align="left">NA</td>
-<td align="left">character</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">extra2</td>
-<td align="left">FALSE</td>
-<td align="left">TRUE</td>
-<td align="right">5</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">character</td>
-</tr>
-</tbody>
-</table>
-<p><code>$all</code> shows all of the compared data from <code>df1</code> and <code>df2</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">all</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="3%">
-<col width="2%">
-<col width="2%">
-<col width="17%">
-<col width="6%">
-<col width="7%">
-<col width="5%">
-<col width="2%">
-<col width="2%">
-<col width="2%">
-<col width="3%">
-<col width="5%">
-<col width="7%">
-<col width="7%">
-<col width="6%">
-<col width="4%">
-<col width="3%">
-<col width="3%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">source</th>
-<th align="right">id1</th>
-<th align="left">id2</th>
-<th align="left">discrepancy</th>
-<th align="right">change group</th>
-<th align="right">exact dup cnt</th>
-<th align="right">ID dup cnt</th>
-<th align="right">num</th>
-<th align="left">char</th>
-<th align="right">int</th>
-<th align="left">log</th>
-<th align="left">date</th>
-<th align="left">class_num_char</th>
-<th align="right">class_num_log</th>
-<th align="right">dec_diff_ref</th>
-<th align="right">dec_diff</th>
-<th align="left">extra1</th>
-<th align="left">extra2</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">1</td>
-<td align="left">A</td>
-<td align="left">changed</td>
-<td align="right">1</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">a</td>
-<td align="right">1</td>
-<td align="left">NA</td>
-<td align="left">2023-01-01</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df2</td>
-<td align="right">1</td>
-<td align="left">A</td>
-<td align="left">changed, exact duplicate</td>
-<td align="right">1</td>
-<td align="right">3</td>
-<td align="right">NA</td>
-<td align="right">1</td>
-<td align="left">a</td>
-<td align="right">1</td>
-<td align="left">NA</td>
-<td align="left">2023-01-01</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">0e+00</td>
-<td align="right">1.000000</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">2</td>
-<td align="left">B</td>
-<td align="left">changed</td>
-<td align="right">2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="left">TRUE</td>
-<td align="left">NA</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df2</td>
-<td align="right">2</td>
-<td align="left">B</td>
-<td align="left">changed</td>
-<td align="right">2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="left">TRUE</td>
-<td align="left">NA</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">-1e-04</td>
-<td align="right">1.000100</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">3</td>
-<td align="left">C</td>
-<td align="left">changed</td>
-<td align="right">3</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">c</td>
-<td align="right">2</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-03</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df2</td>
-<td align="right">3</td>
-<td align="left">C</td>
-<td align="left">changed</td>
-<td align="right">3</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">c</td>
-<td align="right">2</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-03</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">-1e-05</td>
-<td align="right">1.000010</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">4</td>
-<td align="left">D</td>
-<td align="left">changed</td>
-<td align="right">4</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">4</td>
-<td align="left">d</td>
-<td align="right">3</td>
-<td align="left">NA</td>
-<td align="left">2023-01-04</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df2</td>
-<td align="right">4</td>
-<td align="left">D</td>
-<td align="left">changed</td>
-<td align="right">4</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">4</td>
-<td align="left">d</td>
-<td align="right">3</td>
-<td align="left">NA</td>
-<td align="left">2023-01-04</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">-1e-06</td>
-<td align="right">1.000001</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">5</td>
-<td align="left">E</td>
-<td align="left">ID duplicate (not exact duplicate)</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="right">5</td>
-<td align="left">e</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df1</td>
-<td align="right">5</td>
-<td align="left">E</td>
-<td align="left">ID duplicate (not exact duplicate)</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="right">5</td>
-<td align="left">g</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">df1</td>
-<td align="right">5</td>
-<td align="left">Z</td>
-<td align="left">addition, exact duplicate</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="right">NA</td>
-<td align="right">5</td>
-<td align="left">e</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">df1</td>
-<td align="right">5</td>
-<td align="left">NA</td>
-<td align="left">ID contains <code>NA</code>
-</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">5</td>
-<td align="left">g</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">df2</td>
-<td align="right">6</td>
-<td align="left">F</td>
-<td align="left">deletion</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">6</td>
-<td align="left">f</td>
-<td align="right">6</td>
-<td align="left">TRUE</td>
-<td align="left">2023-01-06</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">0e+00</td>
-<td align="right">1.000000</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-<tr class="even">
-<td align="left">df1</td>
-<td align="right">6</td>
-<td align="left">M</td>
-<td align="left">changed</td>
-<td align="right">7</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">5</td>
-<td align="left">e</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">extra1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">df2</td>
-<td align="right">6</td>
-<td align="left">M</td>
-<td align="left">changed</td>
-<td align="right">7</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">5</td>
-<td align="left">e</td>
-<td align="right">5</td>
-<td align="left">FALSE</td>
-<td align="left">2023-01-05</td>
-<td align="left">100</td>
-<td align="right">NA</td>
-<td align="right">1e+00</td>
-<td align="right">1.000000</td>
-<td align="left">NA</td>
-<td align="left">extra2</td>
-</tr>
-</tbody>
-</table>
-<p>The data frame shown above contains special columns that provide information on the comparison for each record:</p>
+<code class="sourceCode R"><span><span class="co"># run the comparison</span></span>
+<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_comparison.html">get_comparison</a></span><span class="op">(</span><span class="va">df1</span>, <span class="va">df2</span>, <span class="va">id_cols</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create the excel report</span></span>
+<span><span class="fu"><a href="reference/create_comparison_excel.html">create_comparison_excel</a></span><span class="op">(</span><span class="va">comparison</span>, path <span class="op">=</span> <span class="st">"comparison_report.xlsx"</span><span class="op">)</span></span></code></pre></div>
+<p>Now we have a multi-tab, color-coded MS Excel report that highlights new changes from <code>df1</code> in green and old values from <code>df2</code> in red. The report also includes summary statistics.</p>
+<p>You can explore the file yourself here:</p>
+<p><a href="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx" class="external-link">Download comparison_report.xlsx</a></p>
+<p>As you will see, there are six tabs in the Excel workbook:</p>
+<ol style="list-style-type: decimal">
+<li>summary: summary statistics</li>
+</ol>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_tab.png" alt=""><p class="caption">Screen shot from ‘summary’ tab of comparison_report.xlsx</p>
+</div>
+<ol start="2" style="list-style-type: decimal">
+<li>summary by column: column summary statistics</li>
+</ol>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png" alt=""><p class="caption">Screen shot from ‘summary by column’ tab of comparison_report.xlsx</p>
+</div>
+<ol start="3" style="list-style-type: decimal">
+<li>data top-bottom: the combined data displayed so that each row of <code>df1</code> is directly above its <code>df2</code> counter part.</li>
+</ol>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_top_bottom.png" alt=""><p class="caption">Screen shot from ‘data top-bottom’ tab of comparison_report.xlsx</p>
+</div>
+<ol start="4" style="list-style-type: decimal">
+<li>data left-right: the same data as shown in <code>data_top_bottom</code>, but where the <code>df1</code> columns are immediately to the left of their <code>df2</code> counter part.</li>
+</ol>
+<div class="figure">
+<img src="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_left_right.png" alt=""><p class="caption">Screen shot from ‘data left-right’ tab of comparison_report.xlsx</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="understand-the-report">Understand the report<a class="anchor" aria-label="anchor" href="#understand-the-report"></a>
+</h3>
+<p>If you look to the far left in the data tabs (data top-bottom and data left-right), you will see some extra columns that report useful comparison information:</p>
 <ul>
-<li><p><code>source</code>: whether the data in the row came from <code>df1</code> or <code>df2</code></p></li>
 <li>
 <p><code>discrepancy</code>: the comparison status, which can take one or more of the following values:</p>
 <ul>
-<li><p><code>"matched"</code>: a row that exactly matched between <code>df1</code> and <code>df2</code> (for <code>matched</code> rows, only the <code>df1</code> copy is shown)</p></li>
+<li><p><code>"matched"</code>: a row that exactly matched between <code>df1</code> and <code>df2</code></p></li>
 <li><p><code>"addition"</code>: a row that only existed in <code>df1</code></p></li>
 <li><p><code>"deletion"</code>: a row that only existed in <code>df2</code></p></li>
 <li><p><code>"changed"</code>: a row where the <code>id_cols</code> matched between between <code>df1</code> and <code>df2</code> but which had a least one other column with a change</p></li>
@@ -1083,19 +485,29 @@
 <li><p><code>"ID contains NA"</code>: a row in either <code>df1</code> or <code>df2</code> which had an <code>NA</code> value in one or more <code>id_cols</code>. The comparison procedure requires non-<code>NA</code> values for all <code>id_cols</code> therefore these rows will not be marked as <code>"matched"</code>, <code>"addition"</code>, <code>"deletion"</code>, or <code>"changed"</code>. The user should fix these errors and re-run the comparison.</p></li>
 </ul>
 </li>
+<li><p><code>source</code>: this column is only show in the data top-bottom sheet and tells you whether the data in the row came from <code>df1</code> or <code>df2</code></p></li>
+</ul>
+<p>The next set of columns are hidden by default, but can be shown by clicking the “+” in the top left corner of the worksheet:</p>
+<ul>
 <li><p><code>change group</code>: if <code>discrepancy</code> contains <code>"changed"</code> this column will be populated with an arbitrary number that links changed records between <code>df1</code> and <code>df2</code></p></li>
 <li><p><code>exact dup cnt</code>: if <code>discrepancy</code> contains <code>"exact duplicate"</code> this column gives the number of exact duplicates in <code>df1</code> or <code>df2</code></p></li>
 <li><p><code>ID dup cnt</code>: if <code>discrepancy</code> contains <code>"ID duplicate (not exact duplicate)"</code> this column gives the number of ID duplicates in <code>df1</code> or <code>df2</code></p></li>
 </ul>
-<p>Finally, we can produce a multi-tab, color-coded MS Excel report of our comparison using <code><a href="reference/create_comparison_excel.html">create_comparison_excel()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"compareDFx"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/create_comparison_excel.html">create_comparison_excel</a></span><span class="op">(</span><span class="va">comparison</span>, </span>
-<span>                        path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"comparison_report.xlsx"</span><span class="op">)</span>,</span>
-<span>                        autoOpen <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p>See the screenshots at the top of this page for an idea of what the Excel report looks like, or you can download the file:</p>
-<p><a href="https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx" class="external-link">Download comparison_report.xlsx</a></p>
+<ol start="5" style="list-style-type: decimal">
+<li><p>df1: the raw data from <code>df1</code>, for reference</p></li>
+<li><p>df2: the raw data from <code>df2</code>, for reference</p></li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="use-the-report">Use the report<a class="anchor" aria-label="anchor" href="#use-the-report"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li><p>If you have any <code>"ID contains NA"</code> values in the <code>discrepancy</code> column, start by fixing those in your raw data, then re-run the report. If these only exist in the older version of your data (<code>df2</code>), then maybe you don’t need to fix these because you are planning on replacing the old version with the new version (<code>df1</code>).</p></li>
+<li><p>If you have any <code>"ID duplicate (not exact duplicate)"</code> in the discrepancy column, investigate why you have rows in <code>df1</code> and/or <code>df2</code> that have the same ID values but different entries in the other columns. Similar to the step above, if these problems are only in your older version (<code>df2</code>), maybe you don’t need to do anything.</p></li>
+<li><p>Next, analyze the different discrepancy types one at a time by filtering on the discrepancy column.</p></li>
+<li><p>Iteratively correct your data and re-run the report until you are satisfied that all differences between <code>df1</code> and <code>df2</code> are supposed to be there.</p></li>
+</ol>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
