@@ -114,15 +114,17 @@ create_comparison_excel(comparison, path = "comparison_report.xlsx")
 
 Now we have a multi-tab, color-coded MS Excel report with summary
 statistics. On the data tabs of the report, all cells from `df1` will
-have a white background and all cells from `df2` will have a grey
-background. The text is colored accordingly:
+have a white background and all cells from `df2` will have a
+![](https://placehold.it/15x15/808080/000000?text=grey) background. The
+text is colored accordingly:
 
-- ![](https://placehold.it/150/ffffff/008000?text='Green')
-  ![](https://placehold.it/150/ffffff/008000?text='text'): cell values
+- ![](https://placehold.it/15x15/ffffff/008000?text=Green)
+  ![](https://placehold.it/15x15/ffffff/008000?text=text): cell values
   in `df1` that are different from `df2`
 
-- <span style="color:red">Red text</span>: cell values in `df2` that are
-  different from `df1`
+- ![](https://placehold.it/15x15/ffffff/FF0000?text=Red)
+  ![](https://placehold.it/15x15/ffffff/FF0000?text=text): cell values
+  in `df2` that are different from `df1`
 
 - Black text: cell values that are the unchanged between `df1` and `df2`
 
