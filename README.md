@@ -117,9 +117,11 @@ statistics. On the data tabs of the report, all cells from `df1` will
 have a white background and all cells from `df2` will have a grey
 background. The text is colored accordingly:
 
-- : cell values in `df1` that are different from `df2`
+- <span style="color:green">Green text</span>: cell values in `df1` that
+  are different from `df2`
 
-- : cell values in `df2` that are different from `df1`
+- <span style="color:red">Red text</span>: cell values in `df2` that are
+  different from `df1`
 
 - Black text: cell values that are the unchanged between `df1` and `df2`
 
