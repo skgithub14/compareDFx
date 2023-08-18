@@ -16,6 +16,9 @@ color codes additions, deletions, and changes which is ideal for R users
 and non-R users alike and makes identifying data issues and version
 differences quick and easy.
 
+![Screen shot from ‘data top-bottom’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_top_bottom.png)
+
 ## Installation
 
 You can install the development version of {compareDFx} like so:
@@ -36,7 +39,7 @@ where `df1` is the newer version. We want to know exactly which values
 changed. Using the two example data frames included with {compareDFx},
 `df1` and `df2`, we will walk through the {compareDFx} workflow.
 
-### Create the report
+### Creating the report
 
 ``` r
 library(compareDFx)
@@ -86,14 +89,12 @@ knitr::kable(compareDFx::df2)
 First, we need to identify which columns make up a row’s unique ID.
 {compareDFx} uses a row’s unique ID to evaluate what changed between
 `df1` and `df2`. For our example, the columns `id1` and `id2` are the ID
-columns.
+columns. This means that both `df1` and `df2` each have two columns
+named `id1` and `id2`.
 
 ``` r
 id_cols <- c("id1", "id2")
 ```
-
-If there are problems with the ID columns (ie there are `NA` values or
-the IDs are not unique), the final report will flag those discrepancies.
 
 Now we can run the comparison and generate the report in Excel:
 
@@ -105,16 +106,17 @@ comparison <- get_comparison(df1, df2, id_cols)
 create_comparison_excel(comparison, path = "comparison_report.xlsx")
 ```
 
-Now we have a multi-tab, color-coded MS Excel report that highlights new
-changes from `df1` in green and old values from `df2` in red. The report
-also includes summary statistics.
+Now we have a multi-tab, color-coded MS Excel report with summary
+statistics. The report highlights new values from `df1` in green text
+and old values from `df2` in red text. Cells from `df1` will have a
+white background and cells from `df2` will have a grey background.
 
 You can explore the file yourself here:
 
 [Download
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
-As you will see, there are six tabs in the Excel workbook:
+As you can see, there are six tabs in the Excel workbook:
 
 1.  summary: summary statistics
 
@@ -127,19 +129,23 @@ comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
 
 3.  data top-bottom: the combined data displayed so that each row of
-    `df1` is directly above its `df2` counter part.
+    `df1` is directly above its `df2` counterpart.
 
 ![Screen shot from ‘data top-bottom’ tab of
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_top_bottom.png)
 
-4.  data left-right: the same data as shown in `data_top_bottom`, but
+4.  data left-right: the same data as shown in data top-bottom, but
     where the `df1` columns are immediately to the left of their `df2`
-    counter part.
+    counterpart.
 
 ![Screen shot from ‘data left-right’ tab of
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_left_right.png)
 
-### Understand the report
+If you aren’t interested the Excel report but want to work with the
+report in R instead, you can use the output from `comparison` directly
+(see the documentation for `get_comparison()`).
+
+### Understanding the report
 
 If you look to the far left in the data tabs (data top-bottom and data
 left-right), you will see some extra columns that report useful
@@ -198,7 +204,9 @@ clicking the “+” in the top left corner of the worksheet:
 
 6.  df2: the raw data from `df2`, for reference
 
-### Use the report
+### Using the report
+
+Here is one way you can use the report that I find effective:
 
 1.  If you have any `"ID contains NA"` values in the `discrepancy`
     column, start by fixing those in your raw data, then re-run the
@@ -206,15 +214,34 @@ clicking the “+” in the top left corner of the worksheet:
     (`df2`), then maybe you don’t need to fix these because you are
     planning on replacing the old version with the new version (`df1`).
 
-2.  If you have any `"ID duplicate (not exact duplicate)"` in the
+2.  If you have any `"ID duplicate (not exact duplicate)"` values in the
     discrepancy column, investigate why you have rows in `df1` and/or
     `df2` that have the same ID values but different entries in the
     other columns. Similar to the step above, if these problems are only
     in your older version (`df2`), maybe you don’t need to do anything.
 
-3.  Next, analyze the different discrepancy types one at a time by
-    filtering on the discrepancy column.
+3.  Filter the `discrepancy` column to find any entries containing
+    `"exact duplicate"`. Depending on your project, exact duplicates
+    might be okay but, you might want to check there are the correct
+    number of duplicates using the `exact dup cnt` column. If exact
+    duplicates are not okay, remove those from your raw data then re-run
+    the report.
 
-4.  Iteratively correct your data and re-run the report until you are
-    satisfied that all differences between `df1` and `df2` are supposed
-    to be there.
+4.  Filter the `discrepancy` column to find any entries containing
+    `"addition"` and `"deletion"`. Check that the ID values are correct.
+    If the ID values are incorrect or misspelled, it is possible that
+    these rows are not true additions and deletions because their ID’s
+    are supposed to match but do not, in which case these rows should
+    actually be categorized as `"matched"` or `"changed"`. If the ID
+    values look good, confirm that the deleted rows are supposed to be
+    deleted and the added rows are supposed to be added.
+
+5.  Filter the `discrepancy` column to find any entries containing
+    `"changed"` and verify that all changes are expected. Fix the any
+    “bad” changes in the raw data and iteratively re-run the report. In
+    some cases, also filtering on the `change group` column can be
+    helpful in drilling down to find issues.
+
+6.  Filter the `discrepancy` column to find any entries containing
+    `"matched"` and verify that these rows were not supposed to change
+    between versions. Fix the issues and re-run the report iteratively.

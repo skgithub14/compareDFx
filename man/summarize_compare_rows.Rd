@@ -39,7 +39,7 @@ is one row per change, not two}
 \item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
-a data frame with three columns: \code{Rows}, \verb{df1 data}, \verb{df2 data}
+a data frame with three columns: \code{Rows}, \code{df1}, \code{df2}
 }
 \description{
 Produces a table of high level summary statistics for comparing two data
