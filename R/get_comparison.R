@@ -196,7 +196,7 @@ segregate_compare <- function(comparison_df,
         all(chng_type %in% c("-", "+")) ~ "changed",
         TRUE ~ NA_character_
       ),
-      .after = source
+      .before = source
     ) %>%
     dplyr::select(-chng_type) %>%
 
@@ -220,7 +220,7 @@ segregate_compare <- function(comparison_df,
     ) %>%
 
     # change grp column to "change group" column, only populated for changes
-    dplyr::relocate(grp, .after = discrepancy) %>%
+    dplyr::relocate(grp, .after = source) %>%
     dplyr::mutate(
       grp = dplyr::if_else(stringr::str_detect(discrepancy, "changed"),
                            grp,
@@ -287,17 +287,57 @@ segregate_compare <- function(comparison_df,
     dplyr::bind_rows(df2_id_dups) %>%
     dplyr::bind_rows(df1_id_NA) %>%
     dplyr::bind_rows(df2_id_NA) %>%
-    dplyr::arrange(dplyr::across(tidyselect::all_of(id_cols)))
+    dplyr::arrange(dplyr::across(c(tidyselect::all_of(id_cols), source)))
 
-  # create left/right view of all data
-  all_lr_df2 <- all_dat3 %>%
+  ## create left/right view of all data
+  # first create dummy rows for additions and deletions
+  all_lr_tmp <- all_dat3 %>%
+    dplyr::mutate(
+      discrepancy = dplyr::case_when(
+        stringr::str_detect(discrepancy, "ID duplicate") ~
+          stringr::str_replace(discrepancy, "ID duplicate", paste(source, "ID duplicate")),
+        stringr::str_detect(discrepancy, "ID contains `NA`") ~
+          stringr::str_replace(discrepancy, "ID contains `NA`", paste(source, "ID contains `NA`")),
+        TRUE ~ discrepancy,
+      ),
+      tmp_col = dplyr::if_else(
+        stringr::str_detect(discrepancy,
+                            "addition|deletion|ID duplicate|ID contains `NA`"),
+        "orig,dummy",
+        "orig"
+      )
+    ) %>%
+    tidyr::separate_rows(tmp_col, sep = ",") %>%
+    dplyr::mutate(
+      source = dplyr::case_when(
+        tmp_col == "dummy" & source == "df1" ~ "df2",
+        tmp_col == "dummy" & source == "df2" ~ "df1",
+        TRUE ~ source
+      ),
+      dplyr::across(c(`exact dup cnt`, `ID dup cnt`),
+                    ~ dplyr::if_else(
+                      tmp_col == "dummy",
+                      NA_real_,
+                      .
+                    )),
+      dplyr::across(-c(source,
+                       discrepancy,
+                       `change group`,
+                       `exact dup cnt`,
+                       `ID dup cnt`,
+                       tidyselect::all_of(id_cols)),
+                    ~ dplyr::if_else(tmp_col == "dummy", NA, .)
+                    )
+    ) %>%
+    dplyr::select(-tmp_col) %>%
+    dplyr::arrange(dplyr::across(c(tidyselect::all_of(id_cols), source)))
+
+  all_lr_df2 <- all_lr_tmp %>%
     dplyr::filter(source == "df2") %>%
     dplyr::select(-c(
       source,
       discrepancy,
       `change group`,
-      `exact dup cnt`,
-      `ID dup cnt`,
       tidyselect::all_of(id_cols)
     )) %>%
     dplyr::rename_with(
@@ -305,44 +345,18 @@ segregate_compare <- function(comparison_df,
       ~ paste0(., ".df2")
     )
 
-  all_lr_df1 <- all_dat3 %>%
+  all_lr_df1 <- all_lr_tmp %>%
     dplyr::filter(source == "df1") %>%
     dplyr::rename_with(
       .cols = -c(
         source,
         discrepancy,
         `change group`,
-        `exact dup cnt`,
-        `ID dup cnt`,
         tidyselect::all_of(id_cols)
       ),
       ~ paste0(., ".df1")
-    )
-
-  # create empty row for the shorter data frame
-  rows_df1 <- nrow(all_lr_df1)
-  rows_df2 <- nrow(all_lr_df2)
-  if (rows_df1 != rows_df2) {
-    diff_rows <- abs(rows_df1 - rows_df2)
-
-    if (rows_df1 < rows_df2) {
-      empty_row <- rep(NA, ncol(all_lr_df1)) %>%
-        setNames(colnames(all_lr_df1)) %>%
-        t() %>%
-        dplyr::as_tibble()
-      for (drs in 1:diff_rows) {
-        all_lr_df1 <- dplyr::bind_rows(all_lr_df1, empty_row)
-      }
-    } else {
-      empty_row <- rep(NA, ncol(all_lr_df2)) %>%
-        setNames(colnames(all_lr_df2)) %>%
-        t() %>%
-        dplyr::as_tibble()
-      for (drs in 1:diff_rows) {
-        all_lr_df2 <- dplyr::bind_rows(all_lr_df2, empty_row)
-      }
-    }
-  }
+    ) %>%
+    dplyr::select(-source)
 
   all_lr_col_order <- colnames(all_lr_df2) %>%
     purrr::map(~ rep(.x, 2)) %>%
@@ -359,14 +373,12 @@ segregate_compare <- function(comparison_df,
   all_lr <- all_lr_df1 %>%
     dplyr::bind_cols(all_lr_df2) %>%
     dplyr::select(
-      source,
       discrepancy,
       `change group`,
-      `exact dup cnt`,
-      `ID dup cnt`,
       tidyselect::all_of(id_cols),
       tidyselect::all_of(all_lr_col_order)
-    )
+    ) %>%
+    dplyr::relocate(tidyselect::all_of(id_cols), .after = `ID dup cnt.df2`)
 
   # create alternate left/right view for changes
   changed_df2 <- changed %>%
@@ -492,7 +504,7 @@ segregate_compare <- function(comparison_df,
                            .before = source)
   tmp_all_lr <- dplyr::mutate(all_lr,
                               index = dplyr::row_number(),
-                              .before = source)
+                              .before = discrepancy)
   non_index_cols <- setdiff(colnames(change_locations), c("grp", id_cols))
   all_index_by_col <- vector(mode = "list", length = length(non_index_cols)) %>%
     setNames(non_index_cols)

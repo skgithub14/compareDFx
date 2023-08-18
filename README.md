@@ -36,6 +36,12 @@ where `df1` is the newer version. We want to know exactly which values
 changed. Using the two example data frames included with {compareDFx},
 `df1` and `df2`, we will walk through the {compareDFx} workflow.
 
+### Create the report
+
+``` r
+library(compareDFx)
+```
+
 <details>
 <summary>
 See the raw data
@@ -77,37 +83,38 @@ knitr::kable(compareDFx::df2)
 
 </details>
 
-Producing the report takes just a few lines of code:
+First, we need to identify which columns make up a row’s unique ID.
+{compareDFx} uses a row’s unique ID to evaluate what changed between
+`df1` and `df2`. For our example, the columns `id1` and `id2` are the ID
+columns.
 
 ``` r
-library(compareDFx)
-
-# identify the columns which collectively make a unique row ID
 id_cols <- c("id1", "id2")
+```
 
+If there are problems with the ID columns (ie there are `NA` values or
+the IDs are not unique), the final report will flag those discrepancies.
+
+Now we can run the comparison and generate the report in Excel:
+
+``` r
 # run the comparison
 comparison <- get_comparison(df1, df2, id_cols)
 
-# set a working directory to put the excel report, this can be anything
-dir <- system.file("extdata", package = "compareDFx")
-
 # create the excel report
-create_comparison_excel(comparison, 
-                        path = file.path(dir, "comparison_report.xlsx"),
-                        autoOpen = FALSE)
+create_comparison_excel(comparison, path = "comparison_report.xlsx")
 ```
 
 Now we have a multi-tab, color-coded MS Excel report that highlights new
 changes from `df1` in green and old values from `df2` in red. The report
 also includes summary statistics.
 
-See the screenshots at the top of this page for an idea of what the
-Excel report looks like, or you can download the file:
+You can explore the file yourself here:
 
 [Download
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
-There are six tabs in the workbook:
+As you will see, there are six tabs in the Excel workbook:
 
 1.  summary: summary statistics
 
@@ -122,24 +129,21 @@ comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst
 3.  data top-bottom: the combined data displayed so that each row of
     `df1` is directly above its `df2` counter part.
 
-![Screen shot from ‘data_top_bottom’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
+![Screen shot from ‘data top-bottom’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_top_bottom.png)
 
 4.  data left-right: the same data as shown in `data_top_bottom`, but
     where the `df1` columns are immediately to the left of their `df2`
     counter part.
 
-![Screen shot from ‘data_top_bottom’ tab of
-comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/all_tab.png)
+![Screen shot from ‘data left-right’ tab of
+comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_left_right.png)
 
-5.  df1: the raw data from `df1`, for reference
+### Understand the report
 
-6.  df2: the raw data from `df2`, for reference
-
-The data tabs (data top-bottom and data left-right) to the far left, you
-will see some extra columns that report useful comparison information:
-
-- `source`: whether the data in the row came from `df1` or `df2`
+If you look to the far left in the data tabs (data top-bottom and data
+left-right), you will see some extra columns that report useful
+comparison information:
 
 - `discrepancy`: the comparison status, which can take one or more of
   the following values:
@@ -173,7 +177,10 @@ will see some extra columns that report useful comparison information:
     marked as `"matched"`, `"addition"`, `"deletion"`, or `"changed"`.
     The user should fix these errors and re-run the comparison.
 
-The next three columns are hidden by default, but can be shown by
+- `source`: this column is only show in the data top-bottom sheet and
+  tells you whether the data in the row came from `df1` or `df2`
+
+The next set of columns are hidden by default, but can be shown by
 clicking the “+” in the top left corner of the worksheet:
 
 - `change group`: if `discrepancy` contains `"changed"` this column will
@@ -186,3 +193,28 @@ clicking the “+” in the top left corner of the worksheet:
 - `ID dup cnt`: if `discrepancy` contains
   `"ID duplicate (not exact duplicate)"` this column gives the number of
   ID duplicates in `df1` or `df2`
+
+5.  df1: the raw data from `df1`, for reference
+
+6.  df2: the raw data from `df2`, for reference
+
+### Use the report
+
+1.  If you have any `"ID contains NA"` values in the `discrepancy`
+    column, start by fixing those in your raw data, then re-run the
+    report. If these only exist in the older version of your data
+    (`df2`), then maybe you don’t need to fix these because you are
+    planning on replacing the old version with the new version (`df1`).
+
+2.  If you have any `"ID duplicate (not exact duplicate)"` in the
+    discrepancy column, investigate why you have rows in `df1` and/or
+    `df2` that have the same ID values but different entries in the
+    other columns. Similar to the step above, if these problems are only
+    in your older version (`df2`), maybe you don’t need to do anything.
+
+3.  Next, analyze the different discrepancy types one at a time by
+    filtering on the discrepancy column.
+
+4.  Iteratively correct your data and re-run the report until you are
+    satisfied that all differences between `df1` and `df2` are supposed
+    to be there.
