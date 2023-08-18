@@ -41,18 +41,23 @@ changed. Using the two example data frames included with {compareDFx},
 
 ### Creating the report
 
+We will start by loading the {compareDFx} package and defining our data
+frames:
+
 ``` r
 library(compareDFx)
+df1 <- compareDFx::df1
+df2 <- compareDFx::df2
 ```
 
 <details>
 <summary>
-See the raw data
+View the example data
 </summary>
 
 ``` r
 # example data, df1 
-knitr::kable(compareDFx::df1)
+knitr::kable(df1)
 ```
 
 | id1 | id2 | num | char | int | log   | date       | class_num_char | class_num_log | dec_diff_ref | dec_diff | extra1 |
@@ -70,7 +75,7 @@ knitr::kable(compareDFx::df1)
 
 ``` r
 # example data, df2
-knitr::kable(compareDFx::df2)
+knitr::kable(df2)
 ```
 
 | id1 | id2 | num | char | int | log   | date       | class_num_char | class_num_log | dec_diff_ref | dec_diff | extra2 |
@@ -86,11 +91,12 @@ knitr::kable(compareDFx::df2)
 
 </details>
 
-First, we need to identify which columns make up a row’s unique ID.
-{compareDFx} uses a row’s unique ID to evaluate what changed between
-`df1` and `df2`. For our example, the columns `id1` and `id2` are the ID
-columns. This means that both `df1` and `df2` each have two columns
-named `id1` and `id2`.
+{compareDFx} uses a row’s unique ID to evaluate what changed between two
+data frames. Unique IDs can consist of one or multiple columns. For
+`df1` and `df2`, the columns the collectively make a unique row ID are
+`id1` and `id2`. This means that in `df1` there are two columns named
+`id1` and `id2` and in `df2` there are also two columns named `id1` and
+`id2`.
 
 ``` r
 id_cols <- c("id1", "id2")
@@ -107,9 +113,15 @@ create_comparison_excel(comparison, path = "comparison_report.xlsx")
 ```
 
 Now we have a multi-tab, color-coded MS Excel report with summary
-statistics. The report highlights new values from `df1` in green text
-and old values from `df2` in red text. Cells from `df1` will have a
-white background and cells from `df2` will have a grey background.
+statistics. On the data tabs of the report, all cells from `df1` will
+have a white background and all cells from `df2` will have a grey
+background. The text is colored accordingly:
+
+- Green text: cell values in `df1` that are different from `df2`
+
+- Red text: cell values in `df2` that are different from `df1`
+
+- Black text: cell values that are the unchanged between `df1` and `df2`
 
 You can explore the file yourself here:
 
@@ -141,9 +153,13 @@ comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst
 ![Screen shot from ‘data left-right’ tab of
 comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_left_right.png)
 
-If you aren’t interested the Excel report but want to work with the
-report in R instead, you can use the output from `comparison` directly
-(see the documentation for `get_comparison()`).
+5.  df1: the raw data from `df1`, for reference
+
+6.  df2: the raw data from `df2`, for reference
+
+If you aren’t interested in the Excel report but want to work with the
+report in R instead, you can use the output from `comparison` object
+directly (see the documentation for `get_comparison()`).
 
 ### Understanding the report
 
@@ -200,10 +216,6 @@ clicking the “+” in the top left corner of the worksheet:
   `"ID duplicate (not exact duplicate)"` this column gives the number of
   ID duplicates in `df1` or `df2`
 
-5.  df1: the raw data from `df1`, for reference
-
-6.  df2: the raw data from `df2`, for reference
-
 ### Using the report
 
 Here is one way you can use the report that I find effective:
@@ -237,10 +249,9 @@ Here is one way you can use the report that I find effective:
     deleted and the added rows are supposed to be added.
 
 5.  Filter the `discrepancy` column to find any entries containing
-    `"changed"` and verify that all changes are expected. Fix the any
-    “bad” changes in the raw data and iteratively re-run the report. In
-    some cases, also filtering on the `change group` column can be
-    helpful in drilling down to find issues.
+    `"changed"` and verify that all changes are expected. Fix any “bad”
+    changes in the raw data and iteratively re-run the report. In some
+    cases, filtering on the `change group` column can be helpful.
 
 6.  Filter the `discrepancy` column to find any entries containing
     `"matched"` and verify that these rows were not supposed to change
