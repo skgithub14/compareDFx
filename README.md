@@ -117,8 +117,9 @@ statistics. On the data tabs of the report, all cells from `df1` will
 have a white background and all cells from `df2` will have a grey
 background. The text is colored accordingly:
 
-- <span style="color:green">Green text</span>: cell values in `df1` that
-  are different from `df2`
+- ![](https://placehold.it/150/ffffff/008000?text='Green')
+  ![](https://placehold.it/150/ffffff/008000?text='text'): cell values
+  in `df1` that are different from `df2`
 
 - <span style="color:red">Red text</span>: cell values in `df2` that are
   different from `df1`
