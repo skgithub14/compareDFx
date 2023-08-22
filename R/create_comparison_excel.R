@@ -51,23 +51,18 @@ create_comparison_excel <- function (comparison,
                                          halign = "center",
                                          valign = "center",
                                          fontColour = "limegreen",
-                                         # fontColour = "#006100",
-                                         # fgFill = "#C6EFCE",
                                          textDecoration = "bold")
   deletionStyle1 <- openxlsx::createStyle(border = "TopBottomLeftRight",
                                          wrapText = TRUE,
                                          halign = "center",
                                          valign = "center",
                                          fontColour = "firebrick1",
-                                         # fontColour = "#9C0006",
-                                         # fgFill = "#FFC7CE",
                                          textDecoration = "bold")
   additionStyle2 <- openxlsx::createStyle(border = "TopBottomLeftRight",
                                           wrapText = TRUE,
                                           halign = "center",
                                           valign = "center",
                                           fontColour = "limegreen",
-                                          # fontColour = "#006100",
                                           fgFill = "lightgrey",
                                           textDecoration = "bold")
   deletionStyle2 <- openxlsx::createStyle(border = "TopBottomLeftRight",
@@ -75,7 +70,6 @@ create_comparison_excel <- function (comparison,
                                           halign = "center",
                                           valign = "center",
                                           fontColour = "firebrick1",
-                                          # fontColour = "#9C0006",
                                           fgFill = "lightgrey",
                                           textDecoration = "bold")
   falseConditionalFormatting <- openxlsx::createStyle(fontColour = "#9C0006",
@@ -91,7 +85,7 @@ create_comparison_excel <- function (comparison,
                          widths = c(15, 5, 5, 65))
 
   # one sentence summary
-  if (all(comparison$all$discrepancy == "matched")) {
+  if (all(comparison$all_tb$discrepancy == "matched")) {
     overall <- "Summary: df1 and df2 matched on all records!!!"
     summaryStatementStyle <- openxlsx::createStyle(fontColour = "#006100",
                                                    fgFill = "#C6EFCE",
@@ -180,24 +174,14 @@ create_comparison_excel <- function (comparison,
     setdiff(c("col_summary_simple",
               "col_summary_by_col",
               "row_summary",
-              "all_index_by_col",
-              "all_index_by_col_lr",
-              "change_index_by_col",
-              "change_index_by_col_lr",
+              "all_tb_change_indices",
+              "all_lr_change_indices",
               "id_cols",
-              "cc_out",
-              "matched",
-              "adds",
-              "dels",
-              "changed",
-              "changed_lr",
-              "exact_dups",
-              "id_dups",
-              "id_NA")) %>%
+              "cc_out")) %>%
     purrr::map(~ {
 
       # set-up the worksheet and write the data
-      if (.x == "all") {
+      if (.x == "all_tb") {
         sname = "data top-bottom"
       } else if (.x == "all_lr") {
         sname = "data left-right"
@@ -210,6 +194,12 @@ create_comparison_excel <- function (comparison,
                              sheet = sname,
                              cols = 1:ncol(comparison[[.x]]),
                              widths = 15)
+
+      # convert date columns to character before writing to Excel
+      comparison[[.x]] <- dplyr::mutate(comparison[[.x]],
+        dplyr::across(.cols = tidyselect::where(lubridate::is.Date),
+                      ~ as.character(.))
+      )
       openxlsx::writeData(wb,
                           sheet = sname,
                           x = comparison[[.x]],
@@ -244,7 +234,7 @@ create_comparison_excel <- function (comparison,
                          gridExpand = TRUE)
 
       # for df2 entries make the background grey
-      if (.x == "all") {
+      if (.x == "all_tb") {
         openxlsx::addStyle(wb,
                            sheet = sname,
                            style = generalGreyStyle,
@@ -262,10 +252,10 @@ create_comparison_excel <- function (comparison,
       }
 
       # conditionally apply addition/deletion formatting for row and value changes
-      if (.x %in% c("all", "all_lr")) {
+      if (.x %in% c("all_tb", "all_lr")) {
 
         # whole rows (additions and deletions only)
-        if (.x == "all") {
+        if (.x == "all_tb") {
 
           # addition rows
           add_rows <- which(
@@ -401,21 +391,21 @@ create_comparison_excel <- function (comparison,
         }
 
         # values in change rows
-        if (.x == "all") {
-          index_lookup <- comparison$all_index_by_col
+        if (.x == "all_tb") {
+          index_lookup <- comparison$all_tb_change_indices
 
         } else if (.x == "all_lr") {
-          index_lookup <- comparison$all_index_by_col_lr
+          index_lookup <- comparison$all_lr_change_indices
 
         } else {
-          stop("x must be one of `c('all', 'changed', 'change_lr')`")
+          stop("x must be one of `c('all_tb', 'all_lr')`")
         }
 
         for (el in seq_along(index_lookup)) {
 
           if (all(is.na(index_lookup[[el]]))) { next }
 
-          if (.x == "all") {
+          if (.x == "all_tb") {
             cols <- which(colnames(comparison[[.x]]) == names(index_lookup)[el])
             df1_rows <- 1 + which(comparison[[.x]]$source == "df1")
             df2_rows <- 1 + which(comparison[[.x]]$source == "df2")
@@ -456,12 +446,12 @@ create_comparison_excel <- function (comparison,
                                gridExpand = TRUE)
           }
         } # end of for loop through index lookup
-      } # end of if statement for all, changed, and changed_lr comparison elements
+      } # end of if statement for all_tb and all_lr comparison elements
 
 
       # conditionally color added/deleted whole columns
       if (!.x %in% c("df1", "df2")) {
-        if (.x == "all") {
+        if (.x == "all_tb") {
 
           # cols added in df1
           openxlsx::addStyle(
@@ -499,7 +489,7 @@ create_comparison_excel <- function (comparison,
             gridExpand = TRUE
           )
 
-          # for the changed left/right view
+          # for the left/right view
         } else if (.x == "all_lr") {
 
           # cols added in df1
@@ -541,7 +531,7 @@ create_comparison_excel <- function (comparison,
       } # end of if statement to format added/deleted whole columns
 
       # group columns
-      if (.x == "all") {
+      if (.x == "all_tb") {
         grouped <- c("change group", "exact dup cnt", "ID dup cnt")
         openxlsx::groupColumns(wb,
                                sheet = sname,

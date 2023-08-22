@@ -17,38 +17,35 @@ equal, default is \code{0.00001}}
 \value{
 a named list with elements:
 \itemize{
-\item \code{col_summary_simple}: high level summary statistics of columns, data frame
-\item \code{col_summary_by_col}: comparison summary statistics by column name, data frame
-\item \code{row_summary}: comparison summary statistics by row, data frame
-\item \code{all}: data frame with all data from \code{df1} and \code{df2} with comparison
-annotations
-\item \code{all_index_by_col}: a list of row indices by column of \code{all} where
-\code{df1} and \code{df2} have different values, this is used by
-\code{\link[=create_comparison_excel]{create_comparison_excel()}} for color-coding changes
-\item \code{all_lr}: the same as \code{all} but where the columns from \code{df1} and \code{df2} are
-viewed side-by-side instead of top-to-bottom
-\item \code{all_index_by_col_lr}: a list of row indices by column of \code{all_lr} where
-\code{df1} and \code{df2} have different values, this is used by
-\code{\link[=create_comparison_excel]{create_comparison_excel()}} for color-coding changes
-\item \code{matched}: data frame with rows of \code{df1} and \code{df2} that match exactly
-\item \code{adds}: data frame with additions in \code{df1}
-\item \code{dels}: data frame with deletions from \code{df2}
-\item \code{changed}: data frame that compares \code{df1} and \code{df2} changed rows,
-a top-bottom view
-\item \code{changed_lr}: data frame that compares \code{df1} and \code{df2} changed rows,
-a left-right view
-\item \code{exact_dups}: a data frame that lists rows that are exact duplicates of
-each other, by \code{df1} and \code{df2}
-\item \code{id_dups}: a data frame that lists rows that have duplicated ID column
-values (meaning IDs are not unique in \code{df1} or \code{df2}) but which are not
-exact duplicates (at least one non-ID column is different from it duplicate
-row)
-\item \code{id_NA}: a data frame of rows with with \code{NA} ID values from \code{df1} and \code{df2}
-\item \code{df1}: the original \code{df1} data frame
-\item \code{df2}: the original \code{df2} data frame
-\item \code{id_cols}: a vector of column names that collectively make a unique row ID
-\item \code{cc_out}: a list output from \code{\link[=compare_cols]{compare_cols()}} that details which columns
-\code{df1} and \code{df2} have in common and the columns they do not have in common
+\item \code{col_summary_simple}: summary statistics for columns
+\item \code{col_summary_by_col}: summary statistics by column
+\item \code{row_summary}: summary statistics for rows
+\item \code{all_tb}: comparison data displayed where each row in \code{df1} is shown
+directly above its \code{df2} counterpart (a top-bottom view) with comparison
+annotation columns
+\item \code{all_lr}: comparison data displayed where each column in \code{df1} is shown
+to the left of its \code{df2} counterpart (a left-right view) with comparison
+annotation columns
+\item \code{all_tb_change_indices}: a named list where the names are the data columns
+in \code{all_tb} and the elements are numeric vectors of the row indices that
+changed between \code{df1} and \code{df2} in a column
+\item \code{all_lr_change_indices}: a named list where the names are the data columns
+in \code{all_lr} and the elements are numeric vectors of the row indices that
+changed between \code{df1} and \code{df2} in a column
+\item \code{id_cols}: the columns in \code{df1} and \code{df2} that form a unique row ID
+\item \code{cc_out}: a name list with four elements:
+\itemize{
+\item \code{same}: a logical indicating whether the column names in \code{df1} and \code{df2}
+are the same
+\item \code{both}: a character vector of column names that are in both \code{df1} and
+\code{df2}
+\item \code{df1_only}: character vector of column names that are in \code{df1} but not
+\code{df2}
+\item \code{df2_only}: character vector of column names that are in \code{df2} but not
+\code{df1}
+}
+\item \code{df1}: the raw data from \code{df1}
+\item \code{df2}: the raw data from \code{df2}
 }
 }
 \description{
