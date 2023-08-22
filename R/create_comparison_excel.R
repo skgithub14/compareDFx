@@ -233,28 +233,28 @@ create_comparison_excel <- function (comparison,
                          cols = 1:ncol(comparison[[.x]]),
                          gridExpand = TRUE)
 
-      # for df2 entries make the background grey
-      if (.x == "all_tb") {
-        openxlsx::addStyle(wb,
-                           sheet = sname,
-                           style = generalGreyStyle,
-                           rows = 1 + which(comparison[[.x]]$source == "df2"),
-                           cols = 1:ncol(comparison[[.x]]),
-                           gridExpand = TRUE)
-
-      } else if (.x == "all_lr") {
-        openxlsx::addStyle(wb,
-                           sheet = sname,
-                           style = generalGreyStyle,
-                           rows = 1 + 1:nrow(comparison[[.x]]),
-                           cols = stringr::str_which(colnames(comparison[[.x]]), "\\.df2$"),
-                           gridExpand = TRUE)
-      }
-
-      # conditionally apply addition/deletion formatting for row and value changes
+      # apply special formatting for comparison data tabs
       if (.x %in% c("all_tb", "all_lr")) {
 
-        # whole rows (additions and deletions only)
+        # for df2 entries make the background grey
+        if (.x == "all_tb") {
+          openxlsx::addStyle(wb,
+                             sheet = sname,
+                             style = generalGreyStyle,
+                             rows = 1 + which(comparison[[.x]]$source == "df2"),
+                             cols = 1:ncol(comparison[[.x]]),
+                             gridExpand = TRUE)
+
+        } else if (.x == "all_lr") {
+          openxlsx::addStyle(wb,
+                             sheet = sname,
+                             style = generalGreyStyle,
+                             rows = 1 + 1:nrow(comparison[[.x]]),
+                             cols = stringr::str_which(colnames(comparison[[.x]]), "\\.df2$"),
+                             gridExpand = TRUE)
+        }
+
+        # conditional formatting for whole rows (additions and deletions only)
         if (.x == "all_tb") {
 
           # addition rows
@@ -390,15 +390,11 @@ create_comparison_excel <- function (comparison,
           )
         }
 
-        # values in change rows
+        # conditionally format values in change rows
         if (.x == "all_tb") {
           index_lookup <- comparison$all_tb_change_indices
-
         } else if (.x == "all_lr") {
           index_lookup <- comparison$all_lr_change_indices
-
-        } else {
-          stop("x must be one of `c('all_tb', 'all_lr')`")
         }
 
         for (el in seq_along(index_lookup)) {
@@ -446,11 +442,8 @@ create_comparison_excel <- function (comparison,
                                gridExpand = TRUE)
           }
         } # end of for loop through index lookup
-      } # end of if statement for all_tb and all_lr comparison elements
 
-
-      # conditionally color added/deleted whole columns
-      if (!.x %in% c("df1", "df2")) {
+        # conditionally color added/deleted whole columns
         if (.x == "all_tb") {
 
           # cols added in df1
@@ -528,24 +521,22 @@ create_comparison_excel <- function (comparison,
             gridExpand = TRUE
           )
         }
-      } # end of if statement to format added/deleted whole columns
 
-      # group columns
-      if (.x == "all_tb") {
-        grouped <- c("change group", "exact dup cnt", "ID dup cnt")
-        openxlsx::groupColumns(wb,
-                               sheet = sname,
-                               cols = which(colnames(comparison[[.x]]) %in% grouped),
-                               hidden = TRUE)
-      } else if (.x == "all_lr") {
-        grouped <- c("change group",
-                     "exact dup cnt.df1", "exact dup cnt.df2",
-                     "ID dup cnt.df1", "ID dup cnt.df2")
-        openxlsx::groupColumns(wb,
-                               sheet = sname,
-                               cols = which(colnames(comparison[[.x]]) %in% grouped),
-                               hidden = TRUE)
-      }
+        # group less important comparison columns and make them hidden initially
+        if (.x %in% c("all_tb", "all_lr")) {
+          if (.x == "all_tb") {
+            grouped <- c("change group", "exact dup cnt", "ID dup cnt")
+          } else if (.x == "all_lr") {
+            grouped <- c("change group",
+                         "exact dup cnt.df1", "exact dup cnt.df2",
+                         "ID dup cnt.df1", "ID dup cnt.df2")
+          }
+          openxlsx::groupColumns(wb,
+                                 sheet = sname,
+                                 cols = which(colnames(comparison[[.x]]) %in% grouped),
+                                 hidden = TRUE)
+        }
+      } # end of if statement for special formatting for all_tb and all_lr
     })
 
   # save the file
