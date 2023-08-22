@@ -51,3 +51,8 @@ are the same
 \description{
 Generates a detailed comparison report of two data frames
 }
+\examples{
+id_cols <- c("id1", "id2")
+comparison <- get_comparison(compareDFx::df1, compareDFx::df2, id_cols)
+
+}

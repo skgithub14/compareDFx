@@ -12,6 +12,12 @@
 #' @returns nothing
 #' @export
 #'
+#' @examples
+#' id_cols <- c("id1", "id2")
+#' comparison <- get_comparison(compareDFx::df1, compareDFx::df2, id_cols)
+#' path <- tempfile(pattern = "comparison_report", fileext = ".xlsx")
+#' create_comparison_excel(comparison, path)
+#'
 create_comparison_excel <- function (comparison,
                                      path = "comparison_report.xlsx",
                                      autoOpen = FALSE) {

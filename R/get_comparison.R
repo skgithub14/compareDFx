@@ -38,6 +38,10 @@
 #'
 #' @export
 #'
+#' @examples
+#' id_cols <- c("id1", "id2")
+#' comparison <- get_comparison(compareDFx::df1, compareDFx::df2, id_cols)
+#'
 get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
 
   # compare the column names
