@@ -3,6 +3,5 @@
 export("%>%")
 export(create_comparison_excel)
 export(get_comparison)
-export(insert_dummy_cols)
 importFrom(magrittr,"%>%")
 importFrom(stats,setNames)

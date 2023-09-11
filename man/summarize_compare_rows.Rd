@@ -4,37 +4,12 @@
 \alias{summarize_compare_rows}
 \title{Summary metrics for data frame comparison by rows}
 \usage{
-summarize_compare_rows(
-  df1,
-  df2,
-  adds,
-  dels,
-  changed_lr,
-  matched,
-  exact_dups,
-  id_dups,
-  id_NA,
-  id_cols
-)
+summarize_compare_rows(df1, df2, all, id_cols)
 }
 \arguments{
 \item{df1, df2}{data frames to compare}
 
-\item{adds}{data frame of additions from \code{df1}}
-
-\item{dels}{data frame of deletions (in \code{df2} but not in \code{df1})}
-
-\item{changed_lr}{data frame of changes in the left/right layout so that there
-is one row per change, not two}
-
-\item{matched}{data frame of unchanged rows where duplicates have been removed}
-
-\item{exact_dups}{an \code{exact_dups} list element returned from
-\code{\link[=segregate_compare]{segregate_compare()}}}
-
-\item{id_dups}{an \code{id_dups} list element returned from \code{\link[=segregate_compare]{segregate_compare()}}}
-
-\item{id_NA}{an \code{id_NA} list element returned from \code{\link[=segregate_compare]{segregate_compare()}}}
+\item{all}{a data frame with all the compared data with \code{discrepancy} column}
 
 \item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
