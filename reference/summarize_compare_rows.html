@@ -54,18 +54,7 @@ frames in terms of rows</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summarize_compare_rows</span><span class="op">(</span></span>
-<span>  <span class="va">df1</span>,</span>
-<span>  <span class="va">df2</span>,</span>
-<span>  <span class="va">adds</span>,</span>
-<span>  <span class="va">dels</span>,</span>
-<span>  <span class="va">changed_lr</span>,</span>
-<span>  <span class="va">matched</span>,</span>
-<span>  <span class="va">exact_dups</span>,</span>
-<span>  <span class="va">id_dups</span>,</span>
-<span>  <span class="va">id_NA</span>,</span>
-<span>  <span class="va">id_cols</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summarize_compare_rows</span><span class="op">(</span><span class="va">df1</span>, <span class="va">df2</span>, <span class="va">all</span>, <span class="va">id_cols</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,34 +63,8 @@ frames in terms of rows</p>
 <dd><p>data frames to compare</p></dd>
 
 
-<dt>adds</dt>
-<dd><p>data frame of additions from <code>df1</code></p></dd>
-
-
-<dt>dels</dt>
-<dd><p>data frame of deletions (in <code>df2</code> but not in <code>df1</code>)</p></dd>
-
-
-<dt>changed_lr</dt>
-<dd><p>data frame of changes in the left/right layout so that there
-is one row per change, not two</p></dd>
-
-
-<dt>matched</dt>
-<dd><p>data frame of unchanged rows where duplicates have been removed</p></dd>
-
-
-<dt>exact_dups</dt>
-<dd><p>an <code>exact_dups</code> list element returned from
-<code><a href="segregate_compare.html">segregate_compare()</a></code></p></dd>
-
-
-<dt>id_dups</dt>
-<dd><p>an <code>id_dups</code> list element returned from <code><a href="segregate_compare.html">segregate_compare()</a></code></p></dd>
-
-
-<dt>id_NA</dt>
-<dd><p>an <code>id_NA</code> list element returned from <code><a href="segregate_compare.html">segregate_compare()</a></code></p></dd>
+<dt>all</dt>
+<dd><p>a data frame with all the compared data with <code>discrepancy</code> column</p></dd>
 
 
 <dt>id_cols</dt>

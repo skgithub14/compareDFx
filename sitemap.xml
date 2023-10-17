@@ -40,7 +40,16 @@
     <loc>https://skgithub14.github.io/compareDFx/reference/find_dups.html</loc>
   </url>
   <url>
+    <loc>https://skgithub14.github.io/compareDFx/reference/get_changed_row_indices_by_column.html</loc>
+  </url>
+  <url>
     <loc>https://skgithub14.github.io/compareDFx/reference/get_comparison.html</loc>
+  </url>
+  <url>
+    <loc>https://skgithub14.github.io/compareDFx/reference/get_left_right_view.html</loc>
+  </url>
+  <url>
+    <loc>https://skgithub14.github.io/compareDFx/reference/get_top_bottom_view.html</loc>
   </url>
   <url>
     <loc>https://skgithub14.github.io/compareDFx/reference/index.html</loc>
@@ -50,9 +59,6 @@
   </url>
   <url>
     <loc>https://skgithub14.github.io/compareDFx/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://skgithub14.github.io/compareDFx/reference/segregate_compare.html</loc>
   </url>
   <url>
     <loc>https://skgithub14.github.io/compareDFx/reference/standardize_col_order.html</loc>

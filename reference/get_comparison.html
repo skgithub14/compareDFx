@@ -73,40 +73,47 @@ equal, default is <code>0.00001</code></p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>a named list with elements:</p><ul><li><p><code>col_summary_simple</code>: high level summary statistics of columns, data frame</p></li>
-<li><p><code>col_summary_by_col</code>: comparison summary statistics by column name, data frame</p></li>
-<li><p><code>row_summary</code>: comparison summary statistics by row, data frame</p></li>
-<li><p><code>all</code>: data frame with all data from <code>df1</code> and <code>df2</code> with comparison
-annotations</p></li>
-<li><p><code>all_index_by_col</code>: a list of row indices by column of <code>all</code> where
-<code>df1</code> and <code>df2</code> have different values, this is used by
-<code><a href="create_comparison_excel.html">create_comparison_excel()</a></code> for color-coding changes</p></li>
-<li><p><code>all_lr</code>: the same as <code>all</code> but where the columns from <code>df1</code> and <code>df2</code> are
-viewed side-by-side instead of top-to-bottom</p></li>
-<li><p><code>all_index_by_col_lr</code>: a list of row indices by column of <code>all_lr</code> where
-<code>df1</code> and <code>df2</code> have different values, this is used by
-<code><a href="create_comparison_excel.html">create_comparison_excel()</a></code> for color-coding changes</p></li>
-<li><p><code>matched</code>: data frame with rows of <code>df1</code> and <code>df2</code> that match exactly</p></li>
-<li><p><code>adds</code>: data frame with additions in <code>df1</code></p></li>
-<li><p><code>dels</code>: data frame with deletions from <code>df2</code></p></li>
-<li><p><code>changed</code>: data frame that compares <code>df1</code> and <code>df2</code> changed rows,
-a top-bottom view</p></li>
-<li><p><code>changed_lr</code>: data frame that compares <code>df1</code> and <code>df2</code> changed rows,
-a left-right view</p></li>
-<li><p><code>exact_dups</code>: a data frame that lists rows that are exact duplicates of
-each other, by <code>df1</code> and <code>df2</code></p></li>
-<li><p><code>id_dups</code>: a data frame that lists rows that have duplicated ID column
-values (meaning IDs are not unique in <code>df1</code> or <code>df2</code>) but which are not
-exact duplicates (at least one non-ID column is different from it duplicate
-row)</p></li>
-<li><p><code>id_NA</code>: a data frame of rows with with <code>NA</code> ID values from <code>df1</code> and <code>df2</code></p></li>
-<li><p><code>df1</code>: the original <code>df1</code> data frame</p></li>
-<li><p><code>df2</code>: the original <code>df2</code> data frame</p></li>
-<li><p><code>id_cols</code>: a vector of column names that collectively make a unique row ID</p></li>
-<li><p><code>cc_out</code>: a list output from <code><a href="compare_cols.html">compare_cols()</a></code> that details which columns
-<code>df1</code> and <code>df2</code> have in common and the columns they do not have in common</p></li>
+<p>a named list with elements:</p><ul><li><p><code>col_summary_simple</code>: summary statistics for columns</p></li>
+<li><p><code>col_summary_by_col</code>: summary statistics by column</p></li>
+<li><p><code>row_summary</code>: summary statistics for rows</p></li>
+<li><p><code>all_tb</code>: comparison data displayed where each row in <code>df1</code> is shown
+directly above its <code>df2</code> counterpart (a top-bottom view) with comparison
+annotation columns</p></li>
+<li><p><code>all_lr</code>: comparison data displayed where each column in <code>df1</code> is shown
+to the left of its <code>df2</code> counterpart (a left-right view) with comparison
+annotation columns</p></li>
+<li><p><code>all_tb_change_indices</code>: a named list where the names are the data columns
+in <code>all_tb</code> and the elements are numeric vectors of the row indices that
+changed between <code>df1</code> and <code>df2</code> in a column</p></li>
+<li><p><code>all_lr_change_indices</code>: a named list where the names are the data columns
+in <code>all_lr</code> and the elements are numeric vectors of the row indices that
+changed between <code>df1</code> and <code>df2</code> in a column</p></li>
+<li><p><code>id_cols</code>: the columns in <code>df1</code> and <code>df2</code> that form a unique row ID</p></li>
+<li><p><code>cc_out</code>: a name list with four elements:</p><ul><li><p><code>same</code>: a logical indicating whether the column names in <code>df1</code> and <code>df2</code>
+are the same</p></li>
+<li><p><code>both</code>: a character vector of column names that are in both <code>df1</code> and
+<code>df2</code></p></li>
+<li><p><code>df1_only</code>: character vector of column names that are in <code>df1</code> but not
+<code>df2</code></p></li>
+<li><p><code>df2_only</code>: character vector of column names that are in <code>df2</code> but not
+<code>df1</code></p></li>
+</ul></li>
+<li><p><code>df1</code>: the raw data from <code>df1</code></p></li>
+<li><p><code>df2</code>: the raw data from <code>df2</code></p></li>
 </ul></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">id_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu">get_comparison</span><span class="op">(</span><span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="df1.html">df1</a></span>, <span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="df2.html">df2</a></span>, <span class="va">id_cols</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::mutate(., source = dplyr::case_when(tmp_col == "dummy" &amp;     source == "df1" ~ "df2", tmp_col == "dummy" &amp; source == "df2" ~     "df1", TRUE ~ source), dplyr::across(c(`exact dup cnt`, `ID dup cnt`),     ~dplyr::if_else(tmp_col == "dummy", NA_real_, .)), dplyr::across(-c(source,     discrepancy, `change group`, `exact dup cnt`, `ID dup cnt`,     tidyselect::all_of(id_cols)), ~dplyr::if_else(tmp_col ==     "dummy", NA, .))):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `dplyr::across(...)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `across()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Problem while evaluating `tidyselect::all_of(id_cols)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'id_cols' not found</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
