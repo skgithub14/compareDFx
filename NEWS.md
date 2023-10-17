@@ -1,4 +1,4 @@
-# compareDFx 0.0.0.9001
+# compareDFx 0.0.0.9002
 
 ## Major changes
 
