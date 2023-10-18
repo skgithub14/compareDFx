@@ -4,11 +4,13 @@
 \alias{get_left_right_view}
 \title{Convert data comparison from top-bottom to left-right view}
 \usage{
-get_left_right_view(top_bottom_view)
+get_left_right_view(top_bottom_view, id_cols)
 }
 \arguments{
 \item{top_bottom_view}{a data frame of comparison data where each row in
 \code{df1} is displayed directly above its \code{df2} counterpart}
+
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
 a modified copy of \code{top_bottom_view} that displays \code{df1} data to
