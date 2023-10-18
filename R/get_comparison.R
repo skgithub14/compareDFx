@@ -85,7 +85,7 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
                                 df2_id_NA = dup_list2$id_NA)
 
   # create left/right view of all data
-  all_lr <- get_left_right_view(top_bottom_view = all_tb)
+  all_lr <- get_left_right_view(top_bottom_view = all_tb, id_cols = id_cols)
 
   # find row indices of all changes by column
   changed_indices <-
@@ -97,7 +97,6 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
   # column comparison report
   col_summary <- summarize_compare_cols(df1 = df1,
                                         df2 = df2,
-                                        id_cols = id_cols,
                                         cc_out = cc_out,
                                         df_standard_cols = standard_cols,
                                         comparison_table_diff = comp$comparison_table_diff)
@@ -599,7 +598,7 @@ get_top_bottom_view <- function(comparison_df,
 #' @returns a modified copy of `top_bottom_view` that displays `df1` data to
 #'  the left of the `df2` data instead of above the `df2` data
 #'
-get_left_right_view <- function(top_bottom_view) {
+get_left_right_view <- function(top_bottom_view, id_cols) {
 
   # first create dummy rows for additions and deletions
   all_lr_tmp <- top_bottom_view %>%
@@ -915,7 +914,6 @@ summarize_compare_rows <- function(df1,
 #'
 summarize_compare_cols <- function (df1,
                                     df2,
-                                    id_cols,
                                     cc_out,
                                     df_standard_cols,
                                     comparison_table_diff) {
