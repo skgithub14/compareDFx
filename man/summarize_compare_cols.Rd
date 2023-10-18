@@ -7,7 +7,6 @@
 summarize_compare_cols(
   df1,
   df2,
-  id_cols,
   cc_out,
   df_standard_cols,
   comparison_table_diff
@@ -15,8 +14,6 @@ summarize_compare_cols(
 }
 \arguments{
 \item{df1, df2}{data frames to compare}
-
-\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 
 \item{cc_out}{a list output from \code{\link[=compare_cols]{compare_cols()}}}
 
