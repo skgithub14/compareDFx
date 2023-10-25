@@ -416,7 +416,10 @@ compare_df_wrapper <- function(df1_no_dups,
 
   # if only 1 id column, need to manually create the grp variable
   if (length(id_cols) == 1) {
-    comp$comparison_df$grp <- comp$comparison_df[[id_cols]]
+    comp$comparison_df <- comp$comparison_df %>%
+      dplyr::group_by(dplyr::across(tidyselect::all_of(id_cols))) %>%
+      dplyr::mutate(grp = dplyr::cur_group_id()) %>%
+      dplyr::ungroup()
   }
 
   # transfer group numbers to comparison_table_diff for future cals
