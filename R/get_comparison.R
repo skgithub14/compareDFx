@@ -11,6 +11,9 @@
 #'  * `col_summary_simple`: summary statistics for columns
 #'  * `col_summary_by_col`: summary statistics by column
 #'  * `row_summary`: summary statistics for rows
+#'  * `all_pivoted`: comparison data displayed where each value in `df1` is
+#'   shown directly to the left of its `df2` counterpart (a pivoted view) with
+#'   comparison annotation columns
 #'  * `all_tb`: comparison data displayed where each row in `df1` is shown
 #'   directly above its `df2` counterpart (a top-bottom view) with comparison
 #'   annotation columns
@@ -73,33 +76,44 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
                              tolerance = tolerance)
 
   # create the top/bottom view of all data
-  all_tb <- get_top_bottom_view(comparison_df = comp$comparison_df,
-                                comparison_table_diff = comp$comparison_table_diff,
-                                id_cols = id_cols,
-                                cc_out = cc_out,
-                                df1_exact_dups = dup_list1$exact_dups,
-                                df2_exact_dups = dup_list2$exact_dups,
-                                df1_id_dups = dup_list1$id_dups,
-                                df2_id_dups = dup_list2$id_dups,
-                                df1_id_NA = dup_list1$id_NA,
-                                df2_id_NA = dup_list2$id_NA)
+  all_tb <- get_top_bottom_view(
+    comparison_df = comp$comparison_df,
+    comparison_table_diff = comp$comparison_table_diff,
+    id_cols = id_cols,
+    cc_out = cc_out,
+    df1_exact_dups = dup_list1$exact_dups,
+    df2_exact_dups = dup_list2$exact_dups,
+    df1_id_dups = dup_list1$id_dups,
+    df2_id_dups = dup_list2$id_dups,
+    df1_id_NA = dup_list1$id_NA,
+    df2_id_NA = dup_list2$id_NA
+  )
 
   # create left/right view of all data
   all_lr <- get_left_right_view(top_bottom_view = all_tb, id_cols = id_cols)
 
   # find row indices of all changes by column
-  changed_indices <-
-    get_changed_row_indices_by_column(top_bottom_view = all_tb,
-                                      left_right_view = all_lr,
-                                      comparison_table_diff = comp$comparison_table_diff,
-                                      id_cols = id_cols)
+  changed_indices <- get_changed_row_indices_by_column(
+    top_bottom_view = all_tb,
+    left_right_view = all_lr,
+    comparison_table_diff = comp$comparison_table_diff,
+    id_cols = id_cols
+  )
+
+  # get pivoted view of the data
+  all_pivoted <- get_pivoted_view(
+    top_bottom_view = all_tb,
+    top_bottom_view_change_indices = changed_indices$top_bottom
+  )
 
   # column comparison report
-  col_summary <- summarize_compare_cols(df1 = df1,
-                                        df2 = df2,
-                                        cc_out = cc_out,
-                                        df_standard_cols = standard_cols,
-                                        comparison_table_diff = comp$comparison_table_diff)
+  col_summary <- summarize_compare_cols(
+    df1 = df1,
+    df2 = df2,
+    cc_out = cc_out,
+    df_standard_cols = standard_cols,
+    comparison_table_diff = comp$comparison_table_diff
+  )
 
   # row comparison report
   row_summary <- summarize_compare_rows(df1 = df1,
@@ -126,6 +140,7 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
       col_summary_simple = col_summary$simple,
       col_summary_by_col = col_summary$by_col,
       row_summary = row_summary,
+      all_pivoted = all_pivoted,
       all_tb = all_tb,
       all_lr = all_lr,
       all_tb_change_indices = changed_indices$top_bottom,
@@ -702,6 +717,122 @@ get_left_right_view <- function(top_bottom_view, id_cols) {
 }
 
 
+#' Get pivot comparison view
+#'
+#' Creates a comparison view of the data which lists out every value in `df1`
+#' directly next to its corresponding value in `df2` in its own row. Each row in
+#' this view is uniquely identified by id columns in `df1` and `df2` along with
+#' a column of column names from `df1` and `df2`. This view also includes a
+#' `record from` column which described whether the records in the row was from
+#' `df1`, `df2`, or `df1 and df2`. It also includes a `Value Changed` column
+#' which will be marked as `"Y"` in the discrepancy change for a record that
+#' was an addition, deletion, or change, marked as `"N"` for matched records,
+#' or marked as `"UNK"` for records that could not be compared between `df1` and
+#' `df1`.
+#'
+#' @inheritParams get_changed_row_indices_by_column
+#' @param top_bottom_view_change_indices the `top_bottom` output of the
+#' [get_changed_row_indices_by_column()] which provides the column and rows in
+#' `top_bottom_view` that have changed between `df1` and `df2`
+#'
+#' @returns a data frame
+#'
+get_pivoted_view <- function(top_bottom_view, top_bottom_view_change_indices) {
+
+  all_records <- top_bottom_view %>%
+    dplyr::select(-c(`change group`,
+                     `exact dup cnt`,
+                     `ID dup cnt`)) %>%
+    tibble::rowid_to_column("ind") %>%
+    dplyr::mutate(dplyr::across(tidyselect::everything(), ~ as.character(.)))
+
+  df1_records <- all_records %>%
+    dplyr::filter(`source` == "df1") %>%
+    tidyr::pivot_longer(cols = setdiff(colnames(.),
+                                       c(id_cols,
+                                         "discrepancy",
+                                         "ind",
+                                         "source")),
+                        names_to = "column name",
+                        values_to = "df1 value")
+
+  df2_records_in_df1 <- all_records %>%
+    dplyr::filter(`source` == "df2" &
+                    stringr::str_detect(discrepancy, "matched|changed")) %>%
+    dplyr::select(-c(discrepancy, ind)) %>%
+    tidyr::pivot_longer(cols = setdiff(colnames(.), c(id_cols, "source")),
+                        names_to = "column name",
+                        values_to = "df2 value")
+
+  df2_only_records <- all_records %>%
+    dplyr::filter(`source` == "df2") %>%
+    dplyr::mutate(`record from` = "df2") %>%
+    dplyr::select(-source) %>%
+    dplyr::filter(stringr::str_detect(discrepancy, "deletion") |
+                    discrepancy == "ID duplicate (not exact duplicate)" |
+                    discrepancy == "ID contains `NA`") %>%
+    tidyr::pivot_longer(cols = setdiff(colnames(.),
+                                       c(id_cols,
+                                         "discrepancy",
+                                         "ind",
+                                         "record from")),
+                        names_to = "column name",
+                        values_to = "d2 value")
+
+  pivoted_records <- df1_records %>%
+    dplyr::left_join(df2_records_in_df1,
+                     by = c(id_cols, "column name"),
+                     suffix = c(".df1", ".df2")) %>%
+    dplyr::mutate(
+      `record from` = dplyr::case_when(
+        !is.na(source.df1) & !is.na(source.df2) ~ "df1 and df2",
+        is.na(source.df1) & !is.na(source.df2) ~ "df2",
+        !is.na(source.df1) & is.na(source.df2) ~ "df1",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    dplyr::select(- tidyselect::starts_with("source")) %>%
+    dplyr::bind_rows(df2_only_records) %>%
+    dplyr::mutate(
+      `value changed` = dplyr::case_when(
+        stringr::str_detect(discrepancy, "matched") ~ "N",
+        stringr::str_detect(discrepancy, "addition|deletion") ~ "Y",
+        discrepancy == "ID duplicate (not exact duplicate)" ~ "UNK",
+        discrepancy == "ID contains `NA`" ~ "UNK",
+
+        # mark as No for now b/c this just means the row changed, not the value
+        stringr::str_detect(discrepancy, "changed") ~ "N",
+        TRUE ~ NA_character_
+      ),
+      .before = `record from`
+    ) %>%
+    dplyr::rename(`row discrepancy` = discrepancy) %>%
+    dplyr::relocate(`row discrepancy`, .after = `value changed`)
+
+  # mark changed records by iterating through the columns
+  for (colname in names(top_bottom_view_change_indices)) {
+
+    # skip if ID column or no changes in the column
+    if (colname %in% id_cols) {
+      next
+    }
+    if(all(is.na(top_bottom_view_change_indices[[colname]]))) {
+      next
+    }
+
+    update_rows <- which(
+      pivoted_records$`column name` == colname &
+        pivoted_records$ind %in% top_bottom_view_change_indices[[colname]]
+    )
+    pivoted_records$`value changed`[update_rows] <- "Y"
+  }
+
+  pivoted_records <- dplyr::select(pivoted_records, -ind)
+
+  return(pivoted_records)
+}
+
+
 #' Get row indices by column of changed values
 #'
 #' Given both top-bottom and left-right comparison data frames, this function
@@ -717,8 +848,8 @@ get_left_right_view <- function(top_bottom_view, id_cols) {
 #' @inheritParams insert_dummy_cols
 #'
 #' @returns a named list where each element's name is a column in
-#'  `comparison_data` and the elements themselves are numeric vectors with the
-#'  row indices that changed
+#'  `comparison_table_diff` and the elements themselves are numeric vectors with
+#'  the row indices that changed
 #'
 get_changed_row_indices_by_column <- function(top_bottom_view,
                                               left_right_view,
