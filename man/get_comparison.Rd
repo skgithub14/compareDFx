@@ -20,6 +20,9 @@ a named list with elements:
 \item \code{col_summary_simple}: summary statistics for columns
 \item \code{col_summary_by_col}: summary statistics by column
 \item \code{row_summary}: summary statistics for rows
+\item \code{all_pivoted}: comparison data displayed where each value in \code{df1} is
+shown directly to the left of its \code{df2} counterpart (a pivoted view) with
+comparison annotation columns
 \item \code{all_tb}: comparison data displayed where each row in \code{df1} is shown
 directly above its \code{df2} counterpart (a top-bottom view) with comparison
 annotation columns

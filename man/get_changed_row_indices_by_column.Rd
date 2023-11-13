@@ -25,8 +25,8 @@ get_changed_row_indices_by_column(
 }
 \value{
 a named list where each element's name is a column in
-\code{comparison_data} and the elements themselves are numeric vectors with the
-row indices that changed
+\code{comparison_table_diff} and the elements themselves are numeric vectors with
+the row indices that changed
 }
 \description{
 Given both top-bottom and left-right comparison data frames, this function

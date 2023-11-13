@@ -1,3 +1,19 @@
+# compareDFx 0.0.0.9004
+
+## Major changes
+
+* Added pivoted view
+
+## Minor changes
+
+* None
+
+## Bug fixes
+
+* None
+
+
+
 # compareDFx 0.0.0.9003
 
 ## Major changes
@@ -11,6 +27,12 @@
 ## Minor changes
 
 * Modified the list elements returned by `get_comparison()`/`segregate_compare()`
+
+## Bug fixes
+
+* None
+
+
 
 # compareDFx 0.0.0.9000
 

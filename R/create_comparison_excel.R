@@ -176,7 +176,7 @@ create_comparison_excel <- function (comparison,
   )
 
   # pivoted view
-  pivoted_sname <- "pivoted"
+  pivoted_sname <- "data pivoted"
   openxlsx::addWorksheet(wb, sheetName = pivoted_sname)
   openxlsx::setColWidths(wb,
                          sheet = pivoted_sname,

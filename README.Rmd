@@ -113,7 +113,7 @@ You can explore the file yourself here:
 
 [Download comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/comparison_report.xlsx)
 
-As you can see, there are six tabs in the Excel workbook:
+As you can see, there are seven tabs in the Excel workbook:
 
 1.  summary: summary statistics
 
@@ -123,23 +123,27 @@ As you can see, there are six tabs in the Excel workbook:
 
 ![Screen shot from 'summary by column' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/summary_by_column_tab.png)
 
-3.  data top-bottom: the combined data displayed so that each row of `df1` is directly above its `df2` counterpart.
+3. data pivoted: the combined data displayed so that each value in `df1` is directly to the left of its `df2` counterpart.
+
+![Screen shot from 'data pivoted' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_pivoted.png)
+
+4.  data top-bottom: the combined data displayed so that each row of `df1` is directly above its `df2` counterpart.
 
 ![Screen shot from 'data top-bottom' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_top_bottom.png)
 
-4.  data left-right: the same data as shown in  data top-bottom, but where the `df1` columns are immediately to the left of their `df2` counterpart.
+5.  data left-right: the same data as shown in  data top-bottom, but where the `df1` columns are immediately to the left of their `df2` counterpart.
 
 ![Screen shot from 'data left-right' tab of comparison_report.xlsx](https://github.com/skgithub14/compareDFx/raw/master/inst/extdata/report_left_right.png)
 
-5.  df1: the raw data from `df1`, for reference
+6.  df1: the raw data from `df1`, for reference
 
-6.  df2: the raw data from `df2`, for reference
+7.  df2: the raw data from `df2`, for reference
 
 If you aren't interested in the Excel report but want to work with the report in R instead, you can use the output from `comparison` object directly (see the documentation for `get_comparison()`).
 
 ### Understanding the report
 
-If you look to the far left in the data tabs (data top-bottom and data left-right), you will see some extra columns that report useful comparison information:
+In the data top-bottom and data left-right tabs, you will see some extra columns that report useful comparison information:
 
 -  `discrepancy`: the comparison status, which can take one or more of the following values:
 
@@ -167,25 +171,11 @@ The next set of columns are hidden by default, but can be shown by clicking the 
 
 -  `ID dup cnt`: if `discrepancy` contains `"ID duplicate (not exact duplicate)"` this column gives the number of ID duplicates in `df1` or `df2`
 
+In the data pivoted tab you will see the comparison columns:
 
-### Using the report
+- `value changed`: will be `"N"` for all values that were unchanged between `df1` and `df2`. For values that were changed, added, or deleted between `df1` and `df2`, this will be `"Y"`. For values which could not be compared between `df1` and `df2` due to ID column issues, this will be `"UNK"`.
 
-Here is one way you can use the report that I find effective:
+-  `row discrepancy`: this column does not describes the discrepancy status between `df1` and `df2` for the value being compared rather, it provides the discrepancy status for the entire row in `df1` and/or `df2` that contains the value. This matches the value of the `discrepancy` column from the data top-bottom and data left-right tabs. 
 
-1. If you have any `"ID contains NA"` values in the `discrepancy` column, start by fixing those in your raw data, then re-run the report. If these only exist in the older version of your data (`df2`), then maybe you don't need to fix these because you are planning on replacing the old version with the new version (`df1`).
-
-2. If you have any `"ID duplicate (not exact duplicate)"` values in the discrepancy column, investigate why you have rows in `df1` and/or `df2` that have the same ID values but different entries in the other columns. Similar to the step above, if these problems are only in your older version (`df2`), maybe you don't need to do anything.
-
-3. Filter the `discrepancy` column to find any entries containing `"exact duplicate"`. Depending on your project, exact duplicates might be okay but, you might want to check there are the correct number of duplicates using the `exact dup cnt` column. If exact duplicates are not okay, remove those from your raw data then re-run the report.
-
-4. Filter the `discrepancy` column to find any entries containing `"addition"` and `"deletion"`. Check that the ID values are correct. If the ID values are incorrect or misspelled, it is possible that these rows are not true additions and deletions because their ID's are supposed to match but do not, in which case these rows should actually be categorized as `"matched"` or `"changed"`. If the ID values look good, confirm that the deleted rows are supposed to be deleted and the added rows are supposed to be added.
-
-5. Filter the `discrepancy` column to find any entries containing `"changed"` and verify that all changes are expected. Fix any "bad" changes in the raw data and iteratively re-run the report. In some cases, filtering on the `change group` column can be helpful.
-
-6. Filter the `discrepancy` column to find any entries containing `"matched"` and verify that these rows were not supposed to change between versions. Fix the issues and re-run the report iteratively.
-
-
-
-
-
+-  `record from`: this describes whether the value being compared was in both `df1` and `df2`, `df1` only, or `df2` only.
 

@@ -777,7 +777,7 @@ get_pivoted_view <- function(top_bottom_view, top_bottom_view_change_indices) {
                                          "ind",
                                          "record from")),
                         names_to = "column name",
-                        values_to = "d2 value")
+                        values_to = "df2 value")
 
   pivoted_records <- df1_records %>%
     dplyr::left_join(df2_records_in_df1,
