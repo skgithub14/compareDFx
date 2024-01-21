@@ -175,9 +175,54 @@ create_comparison_excel <- function (comparison,
     style = falseConditionalFormatting
   )
 
+  # pivoted view
+  pivoted_sname <- "data pivoted"
+  openxlsx::addWorksheet(wb, sheetName = pivoted_sname)
+  openxlsx::setColWidths(wb,
+                         sheet = pivoted_sname,
+                         cols = 1:ncol(comparison$all_pivoted),
+                         widths = 15)
+  openxlsx::writeData(wb, sheet = pivoted_sname, x = comparison$all_pivoted)
+  openxlsx::freezePane(wb, sheet = pivoted_sname, firstRow = T)
+  openxlsx::addFilter(wb,
+                      sheet = pivoted_sname,
+                      rows = 1,
+                      cols = 1:ncol(comparison$all_pivoted))
+  openxlsx::addStyle(wb,
+                     sheet = pivoted_sname,
+                     style = headerStyle,
+                     rows = 1,
+                     cols = 1:ncol(comparison$all_pivoted),
+                     gridExpand = TRUE)
+  openxlsx::addStyle(wb,
+                     sheet = pivoted_sname,
+                     style = generalStyle,
+                     rows = 1 + seq(1, nrow(comparison$all_pivoted)),
+                     cols = 1:ncol(comparison$all_pivoted),
+                     gridExpand = TRUE)
+  openxlsx::addStyle(wb,
+                     sheet = pivoted_sname,
+                     style = generalGreyStyle,
+                     rows = 1 + seq(1, nrow(comparison$all_pivoted)),
+                     cols = which(colnames(comparison$all_pivoted) == "df2 value"),
+                     gridExpand = TRUE)
+  openxlsx::addStyle(wb,
+                     sheet = pivoted_sname,
+                     style = additionStyle1,
+                     rows = 1 + which(comparison$all_pivoted$`value changed` == "Y"),
+                     cols = which(colnames(comparison$all_pivoted) == "df1 value"),
+                     gridExpand = TRUE)
+  openxlsx::addStyle(wb,
+                     sheet = pivoted_sname,
+                     style = deletionStyle2,
+                     rows = 1 + which(comparison$all_pivoted$`value changed` == "Y"),
+                     cols = which(colnames(comparison$all_pivoted) == "df2 value"),
+                     gridExpand = TRUE)
+
   # all other data frames
   y <- names(comparison) %>%
-    setdiff(c("col_summary_simple",
+    setdiff(c("all_pivoted",
+              "col_summary_simple",
               "col_summary_by_col",
               "row_summary",
               "all_tb_change_indices",
