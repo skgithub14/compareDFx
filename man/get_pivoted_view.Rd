@@ -4,7 +4,7 @@
 \alias{get_pivoted_view}
 \title{Get pivot comparison view}
 \usage{
-get_pivoted_view(top_bottom_view, top_bottom_view_change_indices)
+get_pivoted_view(top_bottom_view, top_bottom_view_change_indices, id_cols)
 }
 \arguments{
 \item{top_bottom_view}{a data frame of comparison data where each row in
@@ -13,6 +13,8 @@ get_pivoted_view(top_bottom_view, top_bottom_view_change_indices)
 \item{top_bottom_view_change_indices}{the \code{top_bottom} output of the
 \code{\link[=get_changed_row_indices_by_column]{get_changed_row_indices_by_column()}} which provides the column and rows in
 \code{top_bottom_view} that have changed between \code{df1} and \code{df2}}
+
+\item{id_cols}{a character vector of id columns output from \code{\link[=compare_cols]{compare_cols()}}}
 }
 \value{
 a data frame

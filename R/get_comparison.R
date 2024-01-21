@@ -103,7 +103,8 @@ get_comparison <- function(df1, df2, id_cols, tolerance = 0.00001) {
   # get pivoted view of the data
   all_pivoted <- get_pivoted_view(
     top_bottom_view = all_tb,
-    top_bottom_view_change_indices = changed_indices$top_bottom
+    top_bottom_view_change_indices = changed_indices$top_bottom,
+    id_cols = id_cols
   )
 
   # column comparison report
@@ -731,13 +732,16 @@ get_left_right_view <- function(top_bottom_view, id_cols) {
 #' `df1`.
 #'
 #' @inheritParams get_changed_row_indices_by_column
+#' @inheritParams insert_dummy_cols
 #' @param top_bottom_view_change_indices the `top_bottom` output of the
 #' [get_changed_row_indices_by_column()] which provides the column and rows in
 #' `top_bottom_view` that have changed between `df1` and `df2`
 #'
 #' @returns a data frame
 #'
-get_pivoted_view <- function(top_bottom_view, top_bottom_view_change_indices) {
+get_pivoted_view <- function(top_bottom_view,
+                             top_bottom_view_change_indices,
+                             id_cols) {
 
   all_records <- top_bottom_view %>%
     dplyr::select(-c(`change group`,
