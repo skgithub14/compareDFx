@@ -2,7 +2,7 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-01-21T18:24Z
+last_built: 2024-01-21T19:36Z
 urls:
   reference: https://skgithub14.github.io/compareDFx/reference
   article: https://skgithub14.github.io/compareDFx/articles

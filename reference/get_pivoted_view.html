@@ -78,7 +78,7 @@ or marked as <code>"UNK"</code> for records that could not be compared between <
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_pivoted_view</span><span class="op">(</span><span class="va">top_bottom_view</span>, <span class="va">top_bottom_view_change_indices</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_pivoted_view</span><span class="op">(</span><span class="va">top_bottom_view</span>, <span class="va">top_bottom_view_change_indices</span>, <span class="va">id_cols</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -92,6 +92,10 @@ or marked as <code>"UNK"</code> for records that could not be compared between <
 <dd><p>the <code>top_bottom</code> output of the
 <code><a href="get_changed_row_indices_by_column.html">get_changed_row_indices_by_column()</a></code> which provides the column and rows in
 <code>top_bottom_view</code> that have changed between <code>df1</code> and <code>df2</code></p></dd>
+
+
+<dt>id_cols</dt>
+<dd><p>a character vector of id columns output from <code><a href="compare_cols.html">compare_cols()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">
