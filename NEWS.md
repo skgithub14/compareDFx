@@ -1,3 +1,18 @@
+# compareDFx 0.0.0.9006
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* User can now specify if `create_comparison_excel()` should show NA values that exist in the R data as text 'NA' values or blanks in the Excel report.
+
+## Bug fixes
+
+* None
+
+
 # compareDFx 0.0.0.9005
 
 ## Major changes

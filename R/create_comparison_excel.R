@@ -8,6 +8,11 @@
 #'  `"comparison_report.xlsx"` (must have .xlsx suffix)
 #' @param autoOpen a logical indicating whether the Excel file should be
 #'  automatically opened, default is `FALSE`
+#' @param NAs_as_text a logical indicating whether NA values should appear in
+#'   the Excel report as a text value 'NA' instead of as a blank; default is
+#'   `FALSE`. Note that a side-effect of setting this option to `TRUE` is that
+#'   numeric/integer columns in the data tabs will have an Excel character
+#'   format.
 #'
 #' @returns nothing
 #' @export
@@ -20,7 +25,8 @@
 #'
 create_comparison_excel <- function (comparison,
                                      path = "comparison_report.xlsx",
-                                     autoOpen = FALSE) {
+                                     autoOpen = FALSE,
+                                     NAs_as_text = FALSE) {
 
   wb <- openxlsx::createWorkbook()
   options("openxlsx.minWidth" = 6)
@@ -247,10 +253,25 @@ create_comparison_excel <- function (comparison,
                              widths = 15)
 
       # convert date columns to character before writing to Excel
-      comparison[[.x]] <- dplyr::mutate(comparison[[.x]],
+      comparison[[.x]] <- dplyr::mutate(
+        comparison[[.x]],
         dplyr::across(.cols = tidyselect::where(lubridate::is.Date),
                       ~ as.character(.))
       )
+
+      # convert numeric/integer columns to character so that NA values
+      # will appear as text NA instead of blanks in Excel
+      if (NAs_as_text) {
+        comparison[[.x]] <- dplyr::mutate(
+          comparison[[.x]],
+          dplyr::across(.cols = c(tidyselect::where(is.numeric),
+                                  tidyselect::where(is.integer)),
+                        ~ as.character(.)),
+          dplyr::across(.cols = tidyselect::everything(),
+                        ~ tidyr::replace_na(., "NA"))
+        )
+      }
+
       openxlsx::writeData(wb,
                           sheet = sname,
                           x = comparison[[.x]],
