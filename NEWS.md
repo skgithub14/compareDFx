@@ -1,3 +1,18 @@
+# compareDFx 0.0.0.9006
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Added df1 and df2 names to Excel report
+
+## Bug fixes
+
+* None
+
+
 # compareDFx 0.0.0.9005
 
 ## Major changes
