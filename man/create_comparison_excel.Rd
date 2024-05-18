@@ -7,7 +7,8 @@
 create_comparison_excel(
   comparison,
   path = "comparison_report.xlsx",
-  autoOpen = FALSE
+  autoOpen = FALSE,
+  df_names = NULL
 )
 }
 \arguments{
@@ -18,13 +19,18 @@ create_comparison_excel(
 
 \item{autoOpen}{a logical indicating whether the Excel file should be
 automatically opened, default is \code{FALSE}}
+
+\item{df_names}{an optional character vector of length two that provides
+names for the data frames being compared, the first string in the vector is
+for \code{df1} and the second string in the vector is for \code{df2}. If provided,
+these names will appear in the Excel 'summary' tab. The default is \code{NULL}.}
 }
 \value{
 nothing
 }
 \description{
-Creates a multi-tab report for comparing two data frames with one
-tab for each element of an object returned by \code{\link[=get_comparison]{get_comparison()}}
+Creates a multi-tab report for comparing two data frames with one tab for
+each element of an object returned by \code{\link[=get_comparison]{get_comparison()}}
 }
 \examples{
 id_cols <- c("id1", "id2")
