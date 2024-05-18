@@ -1,13 +1,17 @@
 #' Create Excel report for comparing two data frames
 #'
-#' Creates a multi-tab report for comparing two data frames with one
-#' tab for each element of an object returned by [get_comparison()]
+#' Creates a multi-tab report for comparing two data frames with one tab for
+#' each element of an object returned by [get_comparison()]
 #'
 #' @param comparison a list returned from [get_comparison()]
 #' @param path a string, path of the Excel file to be written, default is
-#'  `"comparison_report.xlsx"` (must have .xlsx suffix)
+#'   `"comparison_report.xlsx"` (must have .xlsx suffix)
 #' @param autoOpen a logical indicating whether the Excel file should be
-#'  automatically opened, default is `FALSE`
+#'   automatically opened, default is `FALSE`
+#' @param df_names an optional character vector of length two that provides
+#'   names for the data frames being compared, the first string in the vector is
+#'   for `df1` and the second string in the vector is for `df2`. If provided,
+#'   these names will appear in the Excel 'summary' tab. The default is `NULL`.
 #'
 #' @returns nothing
 #' @export
@@ -20,7 +24,8 @@
 #'
 create_comparison_excel <- function (comparison,
                                      path = "comparison_report.xlsx",
-                                     autoOpen = FALSE) {
+                                     autoOpen = FALSE,
+                                     df_names = NULL) {
 
   wb <- openxlsx::createWorkbook()
   options("openxlsx.minWidth" = 6)
@@ -116,16 +121,69 @@ create_comparison_excel <- function (comparison,
                      gridExpand = TRUE)
   openxlsx::mergeCells(wb, sheet = summary_sname, cols = 5, rows = 1)
 
+  # data frame names
+  if (!is.null(df_names)) {
+    if (!is.character(df_names) | length(df_names) != 2) {
+      stop("`df_names` must be a character vector of length two.")
+    } else {
+      df1_name <- df_names[1]
+      df2_name <- df_names[2]
+    }
+  } else {
+    df1_name <- "Data frame 1"
+    df2_name <- "Data frame 2"
+  }
+  df_names_dat <- tibble::tribble(
+    ~ abbreviation, ~ name,
+    "df1"         , df1_name,
+    "df2"         , df2_name
+  )
+  openxlsx::writeData(wb,
+                      sheet = summary_sname,
+                      "Data frames compared",
+                      startCol = 1,
+                      startRow = 3)
+  openxlsx::mergeCells(wb,
+                       sheet = summary_sname,
+                       cols = 1:ncol(comparison$col_summary_simple),
+                       rows = 3)
+  openxlsx::addStyle(wb,
+                     sheet = summary_sname,
+                     style = headerLeftStyle,
+                     cols = 1:ncol(comparison$col_summary_simple),
+                     rows = 3,
+                     gridExpand = TRUE)
+  openxlsx::writeData(wb,
+                      sheet = summary_sname,
+                      df_names_dat,
+                      startCol = 1,
+                      startRow = 4,
+                      colNames = FALSE)
+  openxlsx::addStyle(wb,
+                     sheet = summary_sname,
+                     style = generalLeftStyle,
+                     rows = 4:5,
+                     cols = 1:ncol(comparison$col_summary_simple),
+                     gridExpand = TRUE)
+  openxlsx::mergeCells(wb,
+                       sheet = summary_sname,
+                       cols = 2:ncol(comparison$col_summary_simple),
+                       rows = 4)
+  openxlsx::mergeCells(wb,
+                       sheet = summary_sname,
+                       cols = 2:ncol(comparison$col_summary_simple),
+                       rows = 5)
+
   # column simple summary
   openxlsx::writeData(wb,
                       sheet = summary_sname,
                       comparison$col_summary_simple,
-                      startRow = 3,
+                      startRow = 7,
                       headerStyle = headerLeftStyle)
   openxlsx::addStyle(wb,
                      sheet = summary_sname,
                      style = generalLeftStyle,
-                     rows = 4:(nrow(comparison$col_summary_simple) + 3),
+                     rows = 7 + 1:(nrow(comparison$col_summary_simple)),
                      cols = 1:ncol(comparison$col_summary_simple),
                      gridExpand = TRUE)
 
@@ -133,14 +191,13 @@ create_comparison_excel <- function (comparison,
   openxlsx::writeData(wb,
                       sheet = summary_sname,
                       comparison$row_summary,
-                      startRow = nrow(comparison$col_summary_simple) + 5,
+                      startRow = nrow(comparison$col_summary_simple) + 7 + 2,
                       headerStyle = headerLeftStyle)
   openxlsx::addStyle(wb,
                      sheet = summary_sname,
                      style = generalLeftStyle,
-                     rows = seq(nrow(comparison$col_summary_simple) + 6,
-                                nrow(comparison$col_summary_simple) + 5 +
-                                  nrow(comparison$row_summary)),
+                     rows = nrow(comparison$col_summary_simple) + 7 + 2 +
+                       1:nrow(comparison$row_summary),
                      cols = 1:ncol(comparison$row_summary),
                      gridExpand = TRUE)
 
