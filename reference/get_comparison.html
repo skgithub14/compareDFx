@@ -96,9 +96,11 @@ are the same</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">id_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id1"</span>, <span class="st">"id2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu">get_comparison</span><span class="op">(</span><span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="df1.html">df1</a></span>, <span class="fu">compareDFx</span><span class="fu">::</span><span class="va"><a href="df2.html">df2</a></span>, <span class="va">id_cols</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>ID duplicates detected, recommend fixing these and re-running `get_comparison()`</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>ID columns contain `NA`, recommend fixing these and re-running `get_comparison()`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> df1 and df2 have different columns therefore no records are recorded as 'matched'</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::mutate(df1_no_dups, dplyr::across(tidyselect::where(is.numeric),     ~as.character(round_half_up(., rnd)))):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `dplyr::across(...)`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `across()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Can't compute column `id1`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `round_half_up()`:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> could not find function "round_half_up"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
