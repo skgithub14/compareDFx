@@ -19,6 +19,7 @@ BugReports: https://github.com/skgithub14/compareDFx/issues
 Imports: 
     compareDF,
     dplyr,
+    janitor,
     lubridate,
     magrittr,
     openxlsx,
