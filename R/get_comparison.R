@@ -414,20 +414,6 @@ compare_df_wrapper <- function(df1_no_dups,
     rnd <- nchar(tol_chr) - 2
   }
 
-  # make numeric comparisons exact by rounding and converting to character
-  df1_no_dups <- df1_no_dups %>%
-    dplyr::mutate(
-      dplyr::across(tidyselect::where(is.numeric),
-                    ~ janitor::round_half_up(., rnd)),
-      dplyr::across(-`ID dup cnt`, ~ as.character(.))
-    )
-  df2_no_dups <- df2_no_dups %>%
-    dplyr::mutate(
-      dplyr::across(tidyselect::where(is.numeric),
-                    ~ janitor::round_half_up(., rnd)),
-      dplyr::across(-`ID dup cnt`, ~ as.character(.))
-    )
-
   suppressWarnings(
     suppressMessages(
       comp <- compareDF::compare_df(
