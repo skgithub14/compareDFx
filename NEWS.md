@@ -1,3 +1,17 @@
+# compareDFx 1.0.0
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* None
+
+## Bug fixes
+
+* Fixed tolerance/rounding bug when comparing numeric values
+
 # compareDFx 0.0.0.9006
 
 ## Major changes

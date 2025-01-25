@@ -1,6 +1,6 @@
 Package: compareDFx
 Title: Compare Data Frame Versions in R and MS Excel
-Version: 0.0.0.9006
+Version: 1.0.0
 Authors@R: 
     person("Stephen", "Knapp", , "stephen@knappconsultingllc.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5101-4555"))
