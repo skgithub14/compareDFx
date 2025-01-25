@@ -409,7 +409,7 @@ compare_df_wrapper <- function(df1_no_dups,
   if (tolerance > 1) {
     rnd <- 1
   } else {
-    tol_chr <- as.character(tolerance)
+    tol_chr <- format(tolerance, scientific = F)
     tol_chr <- stringr::str_replace(tol_chr, "^\\.", "0.")
     rnd <- nchar(tol_chr) - 2
   }
