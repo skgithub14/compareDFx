@@ -419,13 +419,13 @@ compare_df_wrapper <- function(df1_no_dups,
     dplyr::mutate(
       dplyr::across(tidyselect::where(is.numeric),
                     ~ janitor::round_half_up(., rnd)),
-      dplyr::across(-`ID dup cnt`, as.character(.))
+      dplyr::across(-`ID dup cnt`, ~ as.character(.))
     )
   df2_no_dups <- df2_no_dups %>%
     dplyr::mutate(
       dplyr::across(tidyselect::where(is.numeric),
                     ~ janitor::round_half_up(., rnd)),
-      dplyr::across(-`ID dup cnt`, as.character(.))
+      dplyr::across(-`ID dup cnt`, ~ as.character(.))
     )
 
   suppressWarnings(
